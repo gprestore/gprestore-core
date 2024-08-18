@@ -30,3 +30,7 @@ func (s *Service) FindMany() ([]*model.User, error) {
 func (s *Service) FindOne(id string) (*model.User, error) {
 	return nil, nil
 }
+
+func (s *Service) Delete(id string) (*model.User, error) {
+	return nil, nil
+}

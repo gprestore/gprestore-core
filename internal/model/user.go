@@ -3,17 +3,17 @@ package model
 import (
 	"time"
 
-	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type User struct {
-	Id        uuid.UUID `gorm:"type:uuid;default:gen_random_uuid()" json:"id,omitempty"`
-	Username  string    `gorm:"unique" json:"username,omitempty"`
-	FullName  string    `json:"full_name,omitempty"`
-	Email     string    `gorm:"unique" json:"email,omitempty"`
-	Phone     string    `gorm:"unique" json:"phone,omitempty"`
-	CreatedAt time.Time `gorm:"autoCreateTime" json:"created_at,omitempty"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime" json:"updated_at,omitempty"`
+	Id        primitive.ObjectID `json:"id,omitempty" bson:"_id"`
+	Username  string             `json:"username,omitempty" bson:"username"`
+	FullName  string             `json:"fullName,omitempty" bson:"full_name"`
+	Email     string             `json:"email,omitempty" bson:"email"`
+	Phone     string             `json:"phone,omitempty" bson:"phone"`
+	CreatedAt *time.Time         `json:"createdAt,omitempty" bson:"created_at"`
+	UpdatedAt *time.Time         `json:"updatedAt,omitempty" bson:"updated_at"`
 }
 
 type UserCreateValidation struct {

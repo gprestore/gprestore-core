@@ -7,17 +7,7 @@ import (
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
 )
-
-func NewPostgreSQL() *gorm.DB {
-	db, err := gorm.Open(postgres.Open(viper.GetString("postgres.url")))
-	if err != nil {
-		log.Fatal(err)
-	}
-	return db
-}
 
 func NewMongoDB() *mongo.Database {
 	ctx := context.TODO()
