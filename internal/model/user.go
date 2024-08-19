@@ -20,8 +20,8 @@ type User struct {
 }
 
 type UserVerifyStatus struct {
-	Email bool `json:"email,omitempty" bson:"email"`
-	Phone bool `json:"phone,omitempty" bson:"phone"`
+	Email bool `json:"email" bson:"email"`
+	Phone bool `json:"phone" bson:"phone"`
 }
 
 type UserCreate struct {
@@ -40,7 +40,7 @@ type UserUpdate struct {
 }
 
 type UserFilter struct {
-	Id       string `validate:"omitempty,uuid" bson:"_id" json:"id,omitempty"`
+	Id       string `validate:"omitempty,mongodb" bson:"_id" json:"id,omitempty"`
 	Username string `validate:"omitempty,min=3" bson:"username" json:"username,omitempty"`
 	Email    string `validate:"omitempty,email" bson:"email" json:"email,omitempty"`
 	Phone    string `validate:"omitempty,e164" bson:"phone" json:"phone,omitempty"`

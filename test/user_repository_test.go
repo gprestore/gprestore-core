@@ -46,7 +46,7 @@ func TestUpdateUserRepository(t *testing.T) {
 }
 
 func TestFindUsersRepository(t *testing.T) {
-	users, err := r.FindMany()
+	users, err := r.FindMany(nil)
 	if err != nil {
 		log.Fatal(err)
 	}

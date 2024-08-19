@@ -7,6 +7,7 @@ import (
 
 	"github.com/gprestore/gprestore-core/internal/model"
 	"github.com/gprestore/gprestore-core/pkg/converter"
+	"github.com/gprestore/gprestore-core/pkg/variable"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -47,7 +48,7 @@ func NewRepository(db *mongo.Database) *Repository {
 func (r *Repository) Create(input *model.User) (*model.User, error) {
 	timeNow := time.Now()
 	input.Id = primitive.NewObjectID()
-	input.Role = ROLE_USER
+	input.Role = variable.ROLE_USER
 	input.CreatedAt = &timeNow
 	input.UpdatedAt = &timeNow
 
@@ -82,8 +83,17 @@ func (r *Repository) Update(filter *model.UserFilter, input *model.User) (*model
 	return input, nil
 }
 
-func (r *Repository) FindMany() ([]*model.User, error) {
-	cursor, err := r.collection.Find(context.TODO(), bson.D{})
+func (r *Repository) FindMany(filter *model.UserFilter) ([]*model.User, error) {
+	filterBson := bson.D{}
+	if filter != nil {
+		fb, err := converter.InputToBson(filter)
+		if err != nil {
+			return nil, err
+		}
+		filterBson = fb
+	}
+
+	cursor, err := r.collection.Find(context.TODO(), filterBson)
 	if err != nil {
 		return nil, err
 	}
