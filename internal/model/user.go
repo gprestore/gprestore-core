@@ -16,24 +16,23 @@ type User struct {
 	UpdatedAt *time.Time         `json:"updatedAt,omitempty" bson:"updated_at"`
 }
 
-type UserCreateValidation struct {
+type UserCreate struct {
 	Username string `validate:"required,min=3"`
 	FullName string `validate:"required,min=3"`
 	Email    string `validate:"required,email"`
 	Phone    string `validate:"required,e164"`
 }
 
-type UserUpdateValidation struct {
+type UserUpdate struct {
 	Username string `validate:"omitempty,min=3"`
 	FullName string `validate:"omitempty,min=3"`
 	Email    string `validate:"omitempty,email"`
 	Phone    string `validate:"omitempty,e164"`
 }
 
-type UserFindValidation struct {
+type UserFilter struct {
 	Id       string `validate:"omitempty,uuid"`
 	Username string `validate:"omitempty,min=3"`
-	FullName string `validate:"omitempty,min=3"`
 	Email    string `validate:"omitempty,email"`
 	Phone    string `validate:"omitempty,e164"`
 }

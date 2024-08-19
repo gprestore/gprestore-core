@@ -19,16 +19,6 @@ func init() {
 	r = user.NewRepository(db)
 }
 
-func TestFindUsers(t *testing.T) {
-	users, err := r.FindMany()
-	if err != nil {
-		log.Fatal(err)
-	}
-	for _, user := range users {
-		log.Println(user)
-	}
-}
-
 func TestCreateUser(t *testing.T) {
 	user, err := r.Create(&model.User{
 		Username: "agilistikmal",
@@ -45,8 +35,41 @@ func TestCreateUser(t *testing.T) {
 func TestUpdateUser(t *testing.T) {
 	userId := "66c1f2915941895aca04faaf"
 	user, err := r.Update(userId, &model.User{
-		Email: "agil_g123@safatanc.com",
+		Email: "agil_g@safatanc.com",
 	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(user)
+}
+
+func TestFindUsers(t *testing.T) {
+	users, err := r.FindMany()
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, user := range users {
+		log.Println(user)
+	}
+}
+
+func TestFindUser(t *testing.T) {
+	filter := &model.UserFilter{
+		Username: "agilistikmal",
+	}
+	user, err := r.FindOne(filter)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println(user)
+}
+
+func TestDeleteUser(t *testing.T) {
+	filter := &model.UserFilter{
+		Email: "agil_g123@safatanc.com",
+	}
+	user, err := r.Delete(filter)
 	if err != nil {
 		log.Fatal(err)
 	}

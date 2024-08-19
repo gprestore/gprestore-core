@@ -102,10 +102,30 @@ func (r *Repository) FindMany() ([]*model.User, error) {
 	return users, nil
 }
 
-func (r *Repository) FindOne(id string) (*model.User, error) {
-	return nil, nil
+func (r *Repository) FindOne(filter *model.UserFilter) (*model.User, error) {
+	filterBson, err := converter.InputToBson(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	var user *model.User
+	err = r.collection.FindOne(context.TODO(), filterBson).Decode(&user)
+
+	return user, err
 }
 
-func (r *Repository) Delete(id string) (*model.User, error) {
-	return nil, nil
+func (r *Repository) Delete(filter *model.UserFilter) (*model.User, error) {
+	filterBson, err := converter.InputToBson(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := r.FindOne(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = r.collection.DeleteOne(context.TODO(), filterBson)
+
+	return user, err
 }
