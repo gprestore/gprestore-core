@@ -19,7 +19,7 @@ func init() {
 	r = user.NewRepository(db)
 }
 
-func TestCreateUser(t *testing.T) {
+func TestCreateUserRepository(t *testing.T) {
 	user, err := r.Create(&model.User{
 		Username: "agilistikmal",
 		FullName: "Agil Ghani Istikmal",
@@ -32,9 +32,11 @@ func TestCreateUser(t *testing.T) {
 	log.Println(user)
 }
 
-func TestUpdateUser(t *testing.T) {
+func TestUpdateUserRepository(t *testing.T) {
 	userId := "66c1f2915941895aca04faaf"
-	user, err := r.Update(userId, &model.User{
+	user, err := r.Update(&model.UserFilter{
+		Id: userId,
+	}, &model.User{
 		Email: "agil_g@safatanc.com",
 	})
 	if err != nil {
@@ -43,7 +45,7 @@ func TestUpdateUser(t *testing.T) {
 	log.Println(user)
 }
 
-func TestFindUsers(t *testing.T) {
+func TestFindUsersRepository(t *testing.T) {
 	users, err := r.FindMany()
 	if err != nil {
 		log.Fatal(err)
@@ -53,7 +55,7 @@ func TestFindUsers(t *testing.T) {
 	}
 }
 
-func TestFindUser(t *testing.T) {
+func TestFindUserRepository(t *testing.T) {
 	filter := &model.UserFilter{
 		Username: "agilistikmal",
 	}
@@ -65,7 +67,7 @@ func TestFindUser(t *testing.T) {
 	log.Println(user)
 }
 
-func TestDeleteUser(t *testing.T) {
+func TestDeleteUserRepository(t *testing.T) {
 	filter := &model.UserFilter{
 		Email: "agil_g123@safatanc.com",
 	}

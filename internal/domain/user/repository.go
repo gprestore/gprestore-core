@@ -47,20 +47,16 @@ func NewRepository(db *mongo.Database) *Repository {
 func (r *Repository) Create(input *model.User) (*model.User, error) {
 	timeNow := time.Now()
 	input.Id = primitive.NewObjectID()
+	input.Role = ROLE_USER
 	input.CreatedAt = &timeNow
 	input.UpdatedAt = &timeNow
 
-	result, err := r.collection.InsertOne(context.TODO(), input)
-	if err != nil {
-		return nil, err
-	}
-	input.Id = result.InsertedID.(primitive.ObjectID)
-
-	return input, nil
+	_, err := r.collection.InsertOne(context.TODO(), input)
+	return input, err
 }
 
-func (r *Repository) Update(id string, input *model.User) (*model.User, error) {
-	objectId, err := primitive.ObjectIDFromHex(id)
+func (r *Repository) Update(filter *model.UserFilter, input *model.User) (*model.User, error) {
+	filterBson, err := converter.InputToBson(filter)
 	if err != nil {
 		return nil, err
 	}
@@ -70,11 +66,10 @@ func (r *Repository) Update(id string, input *model.User) (*model.User, error) {
 
 	inputBson, err := converter.InputToBson(input)
 	if err != nil {
-		log.Println("Errrrr")
 		return nil, err
 	}
 
-	result, err := r.collection.UpdateByID(context.TODO(), objectId, bson.D{
+	_, err = r.collection.UpdateOne(context.TODO(), filterBson, bson.D{
 		{
 			Key:   "$set",
 			Value: inputBson,
@@ -83,7 +78,7 @@ func (r *Repository) Update(id string, input *model.User) (*model.User, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Println(result)
+
 	return input, nil
 }
 

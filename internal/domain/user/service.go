@@ -1,36 +1,74 @@
 package user
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/gprestore/gprestore-core/internal/model"
-	"gorm.io/gorm"
+	"github.com/gprestore/gprestore-core/pkg/converter"
 )
 
 type Service struct {
-	DB *gorm.DB
+	repository *Repository
+	validate   *validator.Validate
 }
 
-func NewService(db *gorm.DB) *Service {
+func NewService(repository *Repository, validate *validator.Validate) *Service {
 	return &Service{
-		DB: db,
+		repository: repository,
+		validate:   validate,
 	}
 }
 
-func (s *Service) Create(input *model.User) (*model.User, error) {
-	return nil, nil
+func (s *Service) Create(input *model.UserCreate) (*model.User, error) {
+	err := s.validate.Struct(input)
+	if err != nil {
+		return nil, err
+	}
+
+	inputUser, err := converter.StructConverter[model.User](input)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.repository.Create(inputUser)
+	return user, err
 }
 
-func (s *Service) Update(id string, input *model.User) (*model.User, error) {
-	return nil, nil
+func (s *Service) Update(filter *model.UserFilter, input *model.UserUpdate) (*model.User, error) {
+	err := s.validate.Struct(input)
+	if err != nil {
+		return nil, err
+	}
+
+	inputUser, err := converter.StructConverter[model.User](input)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.repository.Update(filter, inputUser)
+	return user, err
 }
 
 func (s *Service) FindMany() ([]*model.User, error) {
-	return nil, nil
+	users, err := s.repository.FindMany()
+	return users, err
 }
 
-func (s *Service) FindOne(id string) (*model.User, error) {
-	return nil, nil
+func (s *Service) FindOne(filter *model.UserFilter) (*model.User, error) {
+	err := s.validate.Struct(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.repository.FindOne(filter)
+	return user, err
 }
 
-func (s *Service) Delete(id string) (*model.User, error) {
-	return nil, nil
+func (s *Service) Delete(filter *model.UserFilter) (*model.User, error) {
+	err := s.validate.Struct(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	user, err := s.repository.Delete(filter)
+	return user, err
 }

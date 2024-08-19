@@ -24,3 +24,21 @@ func TestInputToBson(t *testing.T) {
 	}
 	log.Println(result)
 }
+
+func TestInputVerifyStatusToBson(t *testing.T) {
+	input := &model.UserUpdate{
+		VerifyStatus: model.UserVerifyStatus{
+			Email: true,
+		},
+	}
+	inputUser, err := converter.StructConverter[model.User](input)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(inputUser)
+	result, err := converter.InputToBson(inputUser)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(result)
+}
