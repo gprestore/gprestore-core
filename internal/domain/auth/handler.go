@@ -5,20 +5,17 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/gprestore/gprestore-core/internal/domain/user"
-	"github.com/gprestore/gprestore-core/internal/model"
 	"github.com/gprestore/gprestore-core/pkg/handler"
-	"github.com/gprestore/gprestore-core/pkg/variable"
 	"github.com/markbates/goth/gothic"
 )
 
 type Handler struct {
-	UserService *user.Service
+	service *Service
 }
 
-func NewHandler(userService *user.Service) *Handler {
+func NewHandler(service *Service) *Handler {
 	return &Handler{
-		UserService: userService,
+		service: service,
 	}
 }
 
@@ -50,42 +47,11 @@ func (h *Handler) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	auth := &model.Auth{
-		Action: variable.AUTH_ACTION_LOGIN,
-		Token: &model.AuthToken{
-			AccessToken:  gothUser.AccessToken,
-			ExpiryAt:     &gothUser.ExpiresAt,
-			RefreshToken: gothUser.RefreshToken,
-		},
-		Provider: gothUser.Provider,
-	}
-
-	filter := &model.UserFilter{
-		Email: gothUser.Email,
-	}
-
-	user, err := h.UserService.FindOne(filter)
+	auth, err := h.service.LoginOrRegister(&gothUser)
 	if err != nil {
-		auth.Action = variable.AUTH_ACTION_REGISTER
-
-		input := &model.UserCreate{
-			Username: "user" + gothUser.UserID,
-			FullName: gothUser.Name,
-			Email:    gothUser.Email,
-			VerifyStatus: model.UserVerifyStatus{
-				Email: true,
-			},
-			Image: gothUser.AvatarURL,
-		}
-
-		user, err = h.UserService.Create(input)
-		if err != nil {
-			handler.HandleError(w, err)
-			return
-		}
+		handler.HandleError(w, err)
+		return
 	}
-
-	auth.User = user
 
 	handler.SendSuccess(w, auth)
 }

@@ -24,7 +24,8 @@ func main() {
 	userHandler := user.NewHandler(userService)
 	user.NewRoutes(mux, userHandler).Init()
 
-	authHandler := auth.NewHandler(userService)
+	authService := auth.NewService(userService)
+	authHandler := auth.NewHandler(authService)
 	auth.NewRoutes(mux, authHandler).Init()
 
 	port := viper.GetString("server.port")
