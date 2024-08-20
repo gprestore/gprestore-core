@@ -8,6 +8,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/gprestore/gprestore-core/internal/config"
 	"github.com/gprestore/gprestore-core/internal/database"
+	"github.com/gprestore/gprestore-core/internal/domain/auth"
 	"github.com/gprestore/gprestore-core/internal/domain/user"
 	"github.com/spf13/viper"
 )
@@ -22,6 +23,9 @@ func main() {
 	userService := user.NewService(userRepository, validate)
 	userHandler := user.NewHandler(userService)
 	user.NewRoutes(mux, userHandler).Init()
+
+	authHandler := auth.NewHandler(userService)
+	auth.NewRoutes(mux, authHandler).Init()
 
 	port := viper.GetString("server.port")
 	log.Printf("Running on http://localhost:%v", port)
