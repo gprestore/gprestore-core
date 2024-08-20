@@ -19,6 +19,8 @@ func NewRoutes(mux *http.ServeMux, handler *Handler) *Routes {
 }
 
 func (r *Routes) Init() {
-	r.mux.Handle("GET /callback/oauth", middleware.Guest(http.HandlerFunc(r.handler.Callback)))
-	r.mux.Handle("GET /auth/login/google", middleware.Guest(http.HandlerFunc(r.handler.LoginGoogle)))
+	// r.mux.Handle("GET /callback/oauth", middleware.Guest(http.HandlerFunc(r.handler.Callback)))
+	// r.mux.Handle("GET /auth/login/google", middleware.Guest(http.HandlerFunc(r.handler.LoginGoogle)))
+	r.mux.Handle("GET /auth/oauth/{provider}", middleware.Guest(http.HandlerFunc(r.handler.OAuth)))
+	r.mux.Handle("GET /callback/oauth/{provider}", middleware.Guest(http.HandlerFunc(r.handler.OAuthCallback)))
 }

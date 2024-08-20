@@ -3,9 +3,11 @@ package config
 import (
 	"log"
 
+	"github.com/markbates/goth"
+	"github.com/markbates/goth/providers/discord"
+	"github.com/markbates/goth/providers/google"
 	"github.com/spf13/viper"
 	"golang.org/x/oauth2"
-	"golang.org/x/oauth2/google"
 )
 
 type Config struct {
@@ -24,18 +26,25 @@ func Load() {
 		log.Fatal(err)
 	}
 
-	googleConfig()
+	oauthConfig()
 }
 
-func googleConfig() {
-	AppConfig.OAuthGoogle = oauth2.Config{
-		RedirectURL:  viper.GetString("oauth.callback_url"),
-		ClientID:     viper.GetString("oauth.google.client_id"),
-		ClientSecret: viper.GetString("oauth.google.client_secret"),
-		Scopes: []string{
+func oauthConfig() {
+	goth.UseProviders(
+		discord.New(
+			viper.GetString("oauth.discord.client_id"),
+			viper.GetString("oauth.discord.client_secret"),
+			viper.GetString("oauth.discord.callback_url"),
+			discord.ScopeEmail,
+			discord.ScopeIdentify,
+			discord.ScopeJoinGuild,
+		),
+		google.New(
+			viper.GetString("oauth.google.client_id"),
+			viper.GetString("oauth.google.client_secret"),
+			viper.GetString("oauth.google.callback_url"),
 			"https://www.googleapis.com/auth/userinfo.email",
 			"https://www.googleapis.com/auth/userinfo.profile",
-		},
-		Endpoint: google.Endpoint,
-	}
+		),
+	)
 }

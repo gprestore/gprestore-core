@@ -1,17 +1,15 @@
 package auth
 
 import (
-	"context"
-	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
-	"github.com/gprestore/gprestore-core/internal/config"
 	"github.com/gprestore/gprestore-core/internal/domain/user"
 	"github.com/gprestore/gprestore-core/internal/model"
 	"github.com/gprestore/gprestore-core/pkg/handler"
 	"github.com/gprestore/gprestore-core/pkg/variable"
-	"github.com/spf13/viper"
+	"github.com/markbates/goth/gothic"
 )
 
 type Handler struct {
@@ -24,45 +22,46 @@ func NewHandler(userService *user.Service) *Handler {
 	}
 }
 
-func (h *Handler) LoginGoogle(w http.ResponseWriter, r *http.Request) {
-	url := config.AppConfig.OAuthGoogle.AuthCodeURL(viper.GetString("oauth.state"))
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+func (h *Handler) OAuth(w http.ResponseWriter, r *http.Request) {
+	log.Println("A")
+	provider := r.PathValue("provider")
+	if provider == "" {
+		handler.SendError(w, fmt.Errorf("provider is empty"), http.StatusBadRequest)
+		return
+	}
+
+	q := r.URL.Query()
+	q.Set("provider", provider)
+	r.URL.RawQuery = q.Encode()
+
+	gothUser, err := gothic.CompleteUserAuth(w, r)
+	if err == nil {
+		handler.SendSuccess(w, gothUser)
+		return
+	}
+
+	gothic.BeginAuthHandler(w, r)
 }
 
-func (h *Handler) Callback(w http.ResponseWriter, r *http.Request) {
-	state := r.URL.Query().Get("state")
-	if state != viper.GetString("oauth.state") {
-		handler.SendError(w, fmt.Errorf("unauthorized"), http.StatusUnauthorized)
-		return
-	}
-
-	code := r.URL.Query().Get("code")
-	token, err := config.AppConfig.OAuthGoogle.Exchange(context.Background(), code)
+func (h *Handler) OAuthCallback(w http.ResponseWriter, r *http.Request) {
+	gothUser, err := gothic.CompleteUserAuth(w, r)
 	if err != nil {
 		handler.HandleError(w, err)
 		return
-	}
-
-	resp, err := http.Get("https://www.googleapis.com/oauth2/v2/userinfo?access_token=" + token.AccessToken)
-	if err != nil {
-		handler.HandleError(w, err)
-		return
-	}
-
-	var authGoogle *model.AuthGoogle
-	err = json.NewDecoder(resp.Body).Decode(&authGoogle)
-	if err != nil {
-		handler.HandleError(w, err)
-		return
-	}
-
-	filter := &model.UserFilter{
-		Email: authGoogle.Email,
 	}
 
 	auth := &model.Auth{
 		Action: variable.AUTH_ACTION_LOGIN,
-		Token:  token,
+		Token: &model.AuthToken{
+			AccessToken:  gothUser.AccessToken,
+			ExpiryAt:     &gothUser.ExpiresAt,
+			RefreshToken: gothUser.RefreshToken,
+		},
+		Provider: gothUser.Provider,
+	}
+
+	filter := &model.UserFilter{
+		Email: gothUser.Email,
 	}
 
 	user, err := h.UserService.FindOne(filter)
@@ -70,13 +69,13 @@ func (h *Handler) Callback(w http.ResponseWriter, r *http.Request) {
 		auth.Action = variable.AUTH_ACTION_REGISTER
 
 		input := &model.UserCreate{
-			Username: "user" + authGoogle.Id,
-			FullName: authGoogle.Name,
-			Email:    authGoogle.Email,
+			Username: "user" + gothUser.UserID,
+			FullName: gothUser.Name,
+			Email:    gothUser.Email,
 			VerifyStatus: model.UserVerifyStatus{
-				Email: authGoogle.VerifiedEmail,
+				Email: true,
 			},
-			Image: authGoogle.Picture,
+			Image: gothUser.AvatarURL,
 		}
 
 		user, err = h.UserService.Create(input)

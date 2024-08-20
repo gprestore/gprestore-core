@@ -1,12 +1,22 @@
 package model
 
-import "golang.org/x/oauth2"
+import (
+	"time"
+)
 
 type Auth struct {
 	// Action: LOGIN, REGISTER
-	Action string        `json:"action,omitempty"`
-	Token  *oauth2.Token `json:"token,omitempty"`
-	User   *User         `json:"user,omitempty"`
+	Action string     `json:"action,omitempty"`
+	User   *User      `json:"user,omitempty"`
+	Token  *AuthToken `json:"token,omitempty"`
+	// Provider: GOOGLE, DISCORD
+	Provider string `json:"provider,omitempty"`
+}
+
+type AuthToken struct {
+	AccessToken  string     `json:"access_token,omitempty"`
+	RefreshToken string     `json:"refresh_token,omitempty"`
+	ExpiryAt     *time.Time `json:"expiry_at,omitempty"`
 }
 
 type AuthGoogle struct {
