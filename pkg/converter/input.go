@@ -2,6 +2,7 @@ package converter
 
 import (
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func InputToBson(input any) (bson.D, error) {
@@ -18,8 +19,15 @@ func InputToBson(input any) (bson.D, error) {
 
 	var finalResult bson.D
 	for _, data := range result {
-		if data.Value == "" || data.Value == nil || data.Key == "_id" {
+		if data.Value == "" || data.Value == nil {
 			continue
+		}
+		if data.Key == "_id" {
+			objectId, err := primitive.ObjectIDFromHex(data.Value.(string))
+			if err != nil {
+				return nil, err
+			}
+			data.Value = objectId
 		}
 		finalResult = append(finalResult, data)
 	}
