@@ -1,6 +1,8 @@
 package converter
 
-import "encoding/json"
+import (
+	"encoding/json"
+)
 
 func StructConverter[T any](data any) (*T, error) {
 	var result T

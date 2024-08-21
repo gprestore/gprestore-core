@@ -30,6 +30,10 @@ func InjectRoute() *route.Route {
 		service.NewAuthService,
 		rest.NewAuthHandler,
 
+		repository.NewStoreRepository,
+		service.NewStoreService,
+		rest.NewStoreHandler,
+
 		route.New,
 	)
 

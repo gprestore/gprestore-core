@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -47,13 +48,18 @@ func NewUserRepository(db *mongo.Database) *UserRepository {
 
 func (r *UserRepository) Create(input *model.User) (*model.User, error) {
 	timeNow := time.Now()
-	input.Id = primitive.NewObjectID()
 	input.Role = variable.ROLE_USER
 	input.CreatedAt = &timeNow
 	input.UpdatedAt = &timeNow
 
-	_, err := r.collection.InsertOne(context.TODO(), input)
-	return input, err
+	result, err := r.collection.InsertOne(context.TODO(), input)
+	if err != nil {
+		return nil, err
+	}
+
+	input.Id = result.InsertedID.(primitive.ObjectID)
+
+	return input, nil
 }
 
 func (r *UserRepository) Update(filter *model.UserFilter, input *model.User) (*model.User, error) {
@@ -70,7 +76,7 @@ func (r *UserRepository) Update(filter *model.UserFilter, input *model.User) (*m
 		return nil, err
 	}
 
-	_, err = r.collection.UpdateOne(context.TODO(), filterBson, bson.D{
+	result, err := r.collection.UpdateOne(context.TODO(), filterBson, bson.D{
 		{
 			Key:   "$set",
 			Value: inputBson,
@@ -80,7 +86,16 @@ func (r *UserRepository) Update(filter *model.UserFilter, input *model.User) (*m
 		return nil, err
 	}
 
-	return input, nil
+	if result.MatchedCount == 0 {
+		return nil, fmt.Errorf("mongo: no documents in result")
+	}
+
+	user, err := r.FindOne(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (r *UserRepository) FindMany(filter *model.UserFilter) ([]*model.User, error) {

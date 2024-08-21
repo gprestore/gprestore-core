@@ -8,10 +8,11 @@ import (
 )
 
 type Route struct {
-	Mux         *http.ServeMux
-	Middleware  *middleware.Middleware
-	UserHandler *rest.UserHandler
-	AuthHandler *rest.AuthHandler
+	Mux          *http.ServeMux
+	Middleware   *middleware.Middleware
+	UserHandler  *rest.UserHandler
+	AuthHandler  *rest.AuthHandler
+	StoreHandler *rest.StoreHandler
 }
 
 func New(
@@ -19,18 +20,21 @@ func New(
 	middleware *middleware.Middleware,
 	userHandler *rest.UserHandler,
 	authHandler *rest.AuthHandler,
+	storeHandler *rest.StoreHandler,
 ) *Route {
 	return &Route{
-		Mux:         mux,
-		Middleware:  middleware,
-		UserHandler: userHandler,
-		AuthHandler: authHandler,
+		Mux:          mux,
+		Middleware:   middleware,
+		UserHandler:  userHandler,
+		AuthHandler:  authHandler,
+		StoreHandler: storeHandler,
 	}
 }
 
 func (r *Route) Init() {
 	r.AuthRoutes()
 	r.UserRoutes()
+	r.StoreRoutes()
 }
 
 func (r *Route) AuthRoutes() {
@@ -45,4 +49,12 @@ func (r *Route) UserRoutes() {
 	r.Mux.Handle("DELETE /user/{id}", r.Middleware.User(http.HandlerFunc(r.UserHandler.DeleteUserById)))
 	r.Mux.Handle("GET /users", r.Middleware.Admin(http.HandlerFunc(r.UserHandler.FindMany)))
 	r.Mux.Handle("GET /user", r.Middleware.User(http.HandlerFunc(r.UserHandler.FindOne)))
+}
+
+func (r *Route) StoreRoutes() {
+	r.Mux.Handle("POST /store", r.Middleware.Admin(http.HandlerFunc(r.StoreHandler.CreateStore)))
+	r.Mux.Handle("PATCH /store/{id}", r.Middleware.User(http.HandlerFunc(r.StoreHandler.UpdateStoreById)))
+	r.Mux.Handle("DELETE /store/{id}", r.Middleware.User(http.HandlerFunc(r.StoreHandler.DeleteStoreById)))
+	r.Mux.Handle("GET /stores", r.Middleware.Admin(http.HandlerFunc(r.StoreHandler.FindMany)))
+	r.Mux.Handle("GET /store", r.Middleware.User(http.HandlerFunc(r.StoreHandler.FindOne)))
 }

@@ -2,7 +2,6 @@ package rest
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
 	"github.com/gprestore/gprestore-core/internal/service"
@@ -21,7 +20,6 @@ func NewAuthHandler(service *service.AuthService) *AuthHandler {
 }
 
 func (h *AuthHandler) OAuth(w http.ResponseWriter, r *http.Request) {
-	log.Println("A")
 	provider := r.PathValue("provider")
 	if provider == "" {
 		handler.SendError(w, fmt.Errorf("provider is empty"), http.StatusBadRequest)

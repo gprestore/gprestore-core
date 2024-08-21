@@ -20,12 +20,16 @@ func InputToBson(input any) (bson.D, error) {
 	var finalResult bson.D
 	for _, data := range result {
 		if data.Value == "" || data.Value == nil {
+			data.Value = nil
 			continue
 		}
 		if data.Key == "_id" {
-			objectId, err := primitive.ObjectIDFromHex(data.Value.(string))
-			if err != nil {
-				return nil, err
+			objectId, ok := data.Value.(primitive.ObjectID)
+			if !ok {
+				objectId, err = primitive.ObjectIDFromHex(data.Value.(string))
+				if err != nil {
+					return nil, err
+				}
 			}
 			data.Value = objectId
 		}

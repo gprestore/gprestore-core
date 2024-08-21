@@ -7,15 +7,15 @@ import (
 )
 
 type User struct {
-	Id       primitive.ObjectID `json:"id,omitempty" bson:"_id"`
+	Id       primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	Username string             `json:"username,omitempty" bson:"username"`
 	FullName string             `json:"full_name,omitempty" bson:"full_name"`
 	Email    string             `json:"email,omitempty" bson:"email"`
-	Phone    string             `json:"phone,omitempty" bson:"phone"`
+	Phone    *string            `json:"phone,omitempty" bson:"phone"`
 	// Role: USER, SELLER, ADMIN
 	Role         string           `json:"role,omitempty" bson:"role"`
 	VerifyStatus UserVerifyStatus `json:"verify_status,omitempty" bson:"verify_status"`
-	Image        string           `json:"image,omitempty"`
+	Image        *string          `json:"image,omitempty"`
 	CreatedAt    *time.Time       `json:"createdAt,omitempty" bson:"created_at"`
 	UpdatedAt    *time.Time       `json:"updatedAt,omitempty" bson:"updated_at"`
 }
@@ -26,26 +26,26 @@ type UserVerifyStatus struct {
 }
 
 type UserCreate struct {
-	Username     string           `validate:"required,min=3" bson:"username" json:"username,omitempty"`
-	FullName     string           `validate:"required,min=3" bson:"full_name" json:"full_name,omitempty"`
-	Email        string           `validate:"required,email" bson:"email" json:"email,omitempty"`
-	Phone        string           `validate:"omitempty,e164" bson:"phone" json:"phone,omitempty"`
-	Image        string           `validate:"omitempty,url" bson:"image" json:"image,omitempty"`
-	VerifyStatus UserVerifyStatus `bson:"verify_status" json:"verify_status,omitempty"`
+	Username     string           `validate:"required,min=3" bson:"username,omitempty" json:"username,omitempty"`
+	FullName     string           `validate:"required,min=3" bson:"full_name,omitempty" json:"full_name,omitempty"`
+	Email        string           `validate:"required,email" bson:"email,omitempty" json:"email,omitempty"`
+	Phone        *string          `validate:"omitempty,e164" bson:"phone,omitempty" json:"phone,omitempty"`
+	Image        string           `validate:"omitempty,url" bson:"image,omitempty" json:"image,omitempty"`
+	VerifyStatus UserVerifyStatus `bson:"verify_status,omitempty" json:"verify_status,omitempty"`
 }
 
 type UserUpdate struct {
-	Username     string           `validate:"omitempty,min=3" bson:"username" json:"username,omitempty"`
-	FullName     string           `validate:"omitempty,min=3" bson:"full_name" json:"full_name,omitempty"`
-	Email        string           `validate:"omitempty,email" bson:"email" json:"email,omitempty"`
-	Phone        string           `validate:"omitempty,e164" bson:"phone" json:"phone,omitempty"`
-	Image        string           `validate:"omitempty,url" bson:"image" json:"image,omitempty"`
-	VerifyStatus UserVerifyStatus `bson:"verify_status" json:"verify_status,omitempty"`
+	Username     string           `validate:"omitempty,min=3" bson:"username,omitempty" json:"username,omitempty"`
+	FullName     string           `validate:"omitempty,min=3" bson:"full_name,omitempty" json:"full_name,omitempty"`
+	Email        string           `validate:"omitempty,email" bson:"email,omitempty" json:"email,omitempty"`
+	Phone        string           `validate:"omitempty,e164" bson:"phone,omitempty" json:"phone,omitempty"`
+	Image        *string          `validate:"omitempty,url" bson:"image,omitempty" json:"image,omitempty"`
+	VerifyStatus UserVerifyStatus `bson:"verify_status,omitempty" json:"verify_status,omitempty"`
 }
 
 type UserFilter struct {
-	Id       string `validate:"omitempty,mongodb" bson:"_id" json:"id,omitempty"`
-	Username string `validate:"omitempty,min=3" bson:"username" json:"username,omitempty"`
-	Email    string `validate:"omitempty,email" bson:"email" json:"email,omitempty"`
-	Phone    string `validate:"omitempty,e164" bson:"phone" json:"phone,omitempty"`
+	Id       string `validate:"omitempty,mongodb" bson:"_id,omitempty" json:"id,omitempty"`
+	Username string `validate:"omitempty,min=3" bson:"username,omitempty" json:"username,omitempty"`
+	Email    string `validate:"omitempty,email" bson:"email,omitempty" json:"email,omitempty"`
+	Phone    string `validate:"omitempty,e164" bson:"phone,omitempty" json:"phone,omitempty"`
 }

@@ -44,7 +44,7 @@ func (s *AuthService) NewPairToken(user *model.User) (*model.AuthToken, error) {
 }
 
 func (s *AuthService) NewAccessToken(user *model.User) (*string, error) {
-	expiryAt := time.Now().Add(15 * time.Minute)
+	expiryAt := time.Now().Add(time.Duration(viper.GetInt("jwt.access_token_expiry")) * time.Second)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id":  user.Id.Hex(),
 		"username": user.Username,
@@ -63,7 +63,7 @@ func (s *AuthService) NewAccessToken(user *model.User) (*string, error) {
 }
 
 func (s *AuthService) NewRefreshToken(userId string) (*string, error) {
-	expiryAt := time.Now().Add(24 * 14 * time.Hour)
+	expiryAt := time.Now().Add(time.Duration(viper.GetInt("jwt.refresh_token_expiry")) * time.Second)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id": userId,
 		"exp":     expiryAt.Unix(),
