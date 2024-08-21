@@ -3,26 +3,21 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/gprestore/gprestore-core/pkg/variable"
 )
 
 type response struct {
-	Success bool    `json:"success"`
-	Code    int     `json:"code"`
-	Message string  `json:"message"`
-	Data    any     `json:"data"`
-	Next    *string `json:"_next"`
+	Success bool   `json:"success"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    any    `json:"data"`
 }
 
-func SendSuccess(w http.ResponseWriter, r *http.Request, data any) {
-	accessToken, _ := r.Context().Value(variable.ContextKeyAccessToken).(string)
+func SendSuccess(w http.ResponseWriter, data any) {
 	resp := &response{
 		Success: true,
 		Code:    http.StatusOK,
 		Message: "ok",
 		Data:    data,
-		Next:    &accessToken,
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -30,7 +25,7 @@ func SendSuccess(w http.ResponseWriter, r *http.Request, data any) {
 	json.NewEncoder(w).Encode(resp)
 }
 
-func SendError(w http.ResponseWriter, r *http.Request, err error, code int) {
+func SendError(w http.ResponseWriter, err error, code int) {
 	resp := &response{
 		Success: false,
 		Code:    code,

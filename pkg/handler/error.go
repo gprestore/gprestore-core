@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func HandleError(w http.ResponseWriter, r *http.Request, err error) {
+func HandleError(w http.ResponseWriter, err error) {
 	errType := reflect.TypeOf(err)
 	log.Println(errType)
 
@@ -27,6 +27,6 @@ func HandleError(w http.ResponseWriter, r *http.Request, err error) {
 	}
 
 	if err != nil {
-		SendError(w, r, err, code)
+		SendError(w, err, code)
 	}
 }

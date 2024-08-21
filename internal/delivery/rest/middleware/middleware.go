@@ -2,12 +2,10 @@ package middleware
 
 import (
 	"context"
-	"errors"
 	"log"
 	"net/http"
 	"strings"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/gprestore/gprestore-core/internal/model"
 	"github.com/gprestore/gprestore-core/internal/service"
 	"github.com/gprestore/gprestore-core/pkg/handler"
@@ -30,12 +28,12 @@ func (m *Middleware) Admin(next http.Handler) http.Handler {
 		user, ok := r.Context().Value(variable.ContextKeyUser).(*model.AuthAccessTokenClaims)
 		if !ok {
 			log.Println(user)
-			handler.SendError(w, r, variable.ErrUnauthorized, http.StatusUnauthorized)
+			handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
 			return
 		}
 
 		if user.Role != variable.ROLE_ADMIN {
-			handler.SendError(w, r, variable.ErrUnauthorized, http.StatusUnauthorized)
+			handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
 			return
 		}
 
@@ -44,48 +42,31 @@ func (m *Middleware) Admin(next http.Handler) http.Handler {
 }
 
 func (m *Middleware) User(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return m.Guest(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		authorization := r.Header.Get("Authorization")
 		splitted := strings.Split(authorization, "Bearer ")
 		if len(splitted) < 2 {
-			handler.SendError(w, r, variable.ErrUnauthorized, http.StatusUnauthorized)
+			handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
 			return
 		}
 
 		accessToken := splitted[1]
-		refreshToken, err := r.Cookie("refreshToken")
-		if err != nil {
-			handler.SendError(w, r, variable.ErrUnauthorized, http.StatusUnauthorized)
-			return
-		}
-
 		if accessToken == "" {
-			handler.SendError(w, r, variable.ErrUnauthorized, http.StatusUnauthorized)
+			handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
 			return
 		}
 
 		accessTokenClaims, err := m.authService.ValidateAccessToken(accessToken)
 		if err != nil {
-			if errors.Is(err, jwt.ErrTokenExpired) {
-				authToken, err := m.authService.RefreshToken(refreshToken.Value)
-				if err != nil {
-					handler.HandleError(w, r, err)
-					return
-				}
-				accessToken = authToken.AccessToken
-				accessTokenClaims, _ = m.authService.ValidateAccessToken(accessToken)
-			} else {
-				handler.HandleError(w, r, err)
-				return
-			}
+			handler.HandleError(w, err)
+			return
 		}
 
-		ctxAccessToken := context.WithValue(context.Background(), variable.ContextKeyAccessToken, accessToken)
-		ctxUser := context.WithValue(ctxAccessToken, variable.ContextKeyUser, accessTokenClaims)
-		r = r.WithContext(ctxUser)
+		ctx := context.WithValue(context.Background(), variable.ContextKeyUser, accessTokenClaims)
+		r = r.WithContext(ctx)
 
 		next.ServeHTTP(w, r)
-	})
+	}))
 }
 
 func (m *Middleware) Guest(next http.Handler) http.Handler {

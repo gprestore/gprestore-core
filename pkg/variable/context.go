@@ -3,6 +3,5 @@ package variable
 type ContextKey string
 
 const (
-	ContextKeyAccessToken ContextKey = "accessToken"
-	ContextKeyUser        ContextKey = "user"
+	ContextKeyUser ContextKey = "user"
 )
