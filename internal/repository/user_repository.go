@@ -98,7 +98,7 @@ func (r *UserRepository) FindMany(filter *model.UserFilter) ([]*model.User, erro
 		return nil, err
 	}
 
-	var users []*model.User
+	var users = make([]*model.User, 0)
 	err = cursor.All(context.TODO(), &users)
 	if err != nil {
 		return nil, err

@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-func HandleError(w http.ResponseWriter, err error) {
+func HandleError(w http.ResponseWriter, r *http.Request, err error) {
 	errType := reflect.TypeOf(err)
 	log.Println(errType)
 
@@ -22,7 +22,11 @@ func HandleError(w http.ResponseWriter, err error) {
 		code = http.StatusBadRequest
 	}
 
+	if strings.Contains(errMessage, "token") {
+		code = http.StatusUnauthorized
+	}
+
 	if err != nil {
-		SendError(w, err, code)
+		SendError(w, r, err, code)
 	}
 }

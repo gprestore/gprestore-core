@@ -1,9 +1,5 @@
 package model
 
-import (
-	"time"
-)
-
 type Auth struct {
 	// Action: LOGIN, REGISTER
 	Action string     `json:"action,omitempty"`
@@ -14,18 +10,18 @@ type Auth struct {
 }
 
 type AuthToken struct {
-	AccessToken  string     `json:"access_token,omitempty"`
-	RefreshToken string     `json:"refresh_token,omitempty"`
-	ExpiryAt     *time.Time `json:"expiry_at,omitempty"`
+	AccessToken  string `json:"access_token,omitempty"`
+	RefreshToken string `json:"refresh_token,omitempty"`
 }
 
-type AuthGoogle struct {
-	Id            string `json:"id,omitempty"`
-	Email         string `json:"email,omitempty"`
-	VerifiedEmail bool   `json:"verified_email,omitempty"`
-	Name          string `json:"name,omitempty"`
-	GivenName     string `json:"given_name,omitempty"`
-	FamilyName    string `json:"family_name,omitempty"`
-	Picture       string `json:"picture,omitempty"`
-	Locale        string `json:"locale,omitempty"`
+type AuthAccessTokenClaims struct {
+	UserId   string `json:"user_id"`
+	Username string `json:"username"`
+	Role     string `json:"role"`
+	Exp      int64  `json:"exp"`
+}
+
+type AuthRefreshTokenClaims struct {
+	UserId string `json:"user_id"`
+	Exp    int64  `json:"exp"`
 }

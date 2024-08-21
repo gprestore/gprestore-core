@@ -36,6 +36,7 @@ func (r *Route) Init() {
 func (r *Route) AuthRoutes() {
 	r.Mux.Handle("GET /auth/oauth/{provider}", r.Middleware.Guest(http.HandlerFunc(r.AuthHandler.OAuth)))
 	r.Mux.Handle("GET /callback/oauth/{provider}", r.Middleware.Guest(http.HandlerFunc(r.AuthHandler.OAuthCallback)))
+	r.Mux.Handle("GET /auth/token/refresh", r.Middleware.Guest(http.HandlerFunc(r.AuthHandler.CheckRefreshToken)))
 }
 
 func (r *Route) UserRoutes() {

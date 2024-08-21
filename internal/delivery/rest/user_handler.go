@@ -24,24 +24,24 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	var input *model.UserCreate
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		handler.HandleError(w, err)
+		handler.HandleError(w, r, err)
 		return
 	}
 
 	user, err := h.service.Create(input)
 	if err != nil {
-		handler.HandleError(w, err)
+		handler.HandleError(w, r, err)
 		return
 	}
 
-	handler.SendSuccess(w, user)
+	handler.SendSuccess(w, r, user)
 }
 
 func (h *UserHandler) UpdateUserById(w http.ResponseWriter, r *http.Request) {
 	var input *model.UserUpdate
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
-		handler.HandleError(w, err)
+		handler.HandleError(w, r, err)
 		return
 	}
 
@@ -51,11 +51,11 @@ func (h *UserHandler) UpdateUserById(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.service.Update(filter, input)
 	if err != nil {
-		handler.HandleError(w, err)
+		handler.HandleError(w, r, err)
 		return
 	}
 
-	handler.SendSuccess(w, user)
+	handler.SendSuccess(w, r, user)
 }
 
 func (h *UserHandler) DeleteUserById(w http.ResponseWriter, r *http.Request) {
@@ -65,11 +65,11 @@ func (h *UserHandler) DeleteUserById(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.service.Delete(filter)
 	if err != nil {
-		handler.HandleError(w, err)
+		handler.HandleError(w, r, err)
 		return
 	}
 
-	handler.SendSuccess(w, user)
+	handler.SendSuccess(w, r, user)
 }
 
 func (h *UserHandler) FindMany(w http.ResponseWriter, r *http.Request) {
@@ -85,11 +85,11 @@ func (h *UserHandler) FindMany(w http.ResponseWriter, r *http.Request) {
 
 	users, err := h.service.FindMany(filter)
 	if err != nil {
-		handler.HandleError(w, err)
+		handler.HandleError(w, r, err)
 		return
 	}
 
-	handler.SendSuccess(w, users)
+	handler.SendSuccess(w, r, users)
 }
 
 func (h *UserHandler) FindOne(w http.ResponseWriter, r *http.Request) {
@@ -105,9 +105,9 @@ func (h *UserHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.service.FindOne(filter)
 	if err != nil {
-		handler.HandleError(w, err)
+		handler.HandleError(w, r, err)
 		return
 	}
 
-	handler.SendSuccess(w, user)
+	handler.SendSuccess(w, r, user)
 }

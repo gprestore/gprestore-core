@@ -24,7 +24,7 @@ func (h *AuthHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 	log.Println("A")
 	provider := r.PathValue("provider")
 	if provider == "" {
-		handler.SendError(w, fmt.Errorf("provider is empty"), http.StatusBadRequest)
+		handler.SendError(w, r, fmt.Errorf("provider is empty"), http.StatusBadRequest)
 		return
 	}
 
@@ -34,7 +34,7 @@ func (h *AuthHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 
 	gothUser, err := gothic.CompleteUserAuth(w, r)
 	if err == nil {
-		handler.SendSuccess(w, gothUser)
+		handler.SendSuccess(w, r, gothUser)
 		return
 	}
 
@@ -44,15 +44,37 @@ func (h *AuthHandler) OAuth(w http.ResponseWriter, r *http.Request) {
 func (h *AuthHandler) OAuthCallback(w http.ResponseWriter, r *http.Request) {
 	gothUser, err := gothic.CompleteUserAuth(w, r)
 	if err != nil {
-		handler.HandleError(w, err)
+		handler.HandleError(w, r, err)
 		return
 	}
 
 	auth, err := h.service.LoginOrRegister(&gothUser)
 	if err != nil {
-		handler.HandleError(w, err)
+		handler.HandleError(w, r, err)
 		return
 	}
 
-	handler.SendSuccess(w, auth)
+	http.SetCookie(w, &http.Cookie{
+		Name:  "refreshToken",
+		Value: auth.Token.RefreshToken,
+		Path:  "/",
+	})
+
+	handler.SendSuccess(w, r, auth)
+}
+
+func (h *AuthHandler) CheckRefreshToken(w http.ResponseWriter, r *http.Request) {
+	refreshToken, err := r.Cookie("refreshToken")
+	if err != nil {
+		handler.HandleError(w, r, err)
+		return
+	}
+
+	authToken, err := h.service.RefreshToken(refreshToken.Value)
+	if err != nil {
+		handler.HandleError(w, r, err)
+		return
+	}
+
+	handler.SendSuccess(w, r, authToken)
 }

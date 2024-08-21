@@ -25,12 +25,33 @@ func NewAuthService(userRepository *repository.UserRepository) *AuthService {
 	}
 }
 
-func (s *AuthService) NewAccessWithRefreshToken(user *model.User) (*model.AuthToken, error) {
+func (s *AuthService) NewPairToken(user *model.User) (*model.AuthToken, error) {
+	accessToken, err := s.NewAccessToken(user)
+	if err != nil {
+		return nil, err
+	}
+	refreshToken, err := s.NewRefreshToken(user.Id.Hex())
+	if err != nil {
+		return nil, err
+	}
+
+	authToken := &model.AuthToken{
+		AccessToken:  *accessToken,
+		RefreshToken: *refreshToken,
+	}
+
+	return authToken, nil
+}
+
+func (s *AuthService) NewAccessToken(user *model.User) (*string, error) {
+	expiryAt := time.Now().Add(15 * time.Minute)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"user_id":  user.Id.Hex(),
 		"username": user.Username,
+		"email":    user.Email,
+		"phone":    user.Phone,
 		"role":     user.Role,
-		"exp":      time.Now().Add(1 * time.Hour).Unix(),
+		"exp":      expiryAt.Unix(),
 	})
 
 	accessToken, err := token.SignedString([]byte(viper.GetString("jwt.secret")))
@@ -38,14 +59,14 @@ func (s *AuthService) NewAccessWithRefreshToken(user *model.User) (*model.AuthTo
 		return nil, err
 	}
 
-	return s.NewRefreshToken(accessToken)
+	return &accessToken, nil
 }
 
-func (s *AuthService) NewRefreshToken(accessToken string) (*model.AuthToken, error) {
+func (s *AuthService) NewRefreshToken(userId string) (*string, error) {
 	expiryAt := time.Now().Add(24 * 14 * time.Hour)
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"token": accessToken,
-		"exp":   expiryAt,
+		"user_id": userId,
+		"exp":     expiryAt.Unix(),
 	})
 
 	refreshToken, err := token.SignedString([]byte(viper.GetString("jwt.secret")))
@@ -53,11 +74,7 @@ func (s *AuthService) NewRefreshToken(accessToken string) (*model.AuthToken, err
 		return nil, err
 	}
 
-	return &model.AuthToken{
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-		ExpiryAt:     &expiryAt,
-	}, nil
+	return &refreshToken, nil
 }
 
 func (s *AuthService) FindUser(filter *model.UserFilter) (*model.User, error) {
@@ -110,7 +127,7 @@ func (s *AuthService) LoginOrRegister(gothUser *goth.User) (*model.Auth, error) 
 		}
 	}
 
-	authToken, err := s.NewAccessWithRefreshToken(user)
+	authToken, err := s.NewPairToken(user)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +138,7 @@ func (s *AuthService) LoginOrRegister(gothUser *goth.User) (*model.Auth, error) 
 	return auth, nil
 }
 
-func (s *AuthService) ValidateAccessToken(accessToken string) (*model.User, error) {
+func (s *AuthService) ValidateAccessToken(accessToken string) (*model.AuthAccessTokenClaims, error) {
 	token, err := jwt.Parse(accessToken, func(t *jwt.Token) (interface{}, error) {
 		_, ok := t.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
@@ -138,18 +155,17 @@ func (s *AuthService) ValidateAccessToken(accessToken string) (*model.User, erro
 		return nil, fmt.Errorf("invalid token")
 	}
 
-	filter := &model.UserFilter{
-		Id: claims["user_id"].(string),
+	authClaims := &model.AuthAccessTokenClaims{
+		UserId:   claims["user_id"].(string),
+		Username: claims["username"].(string),
+		Role:     claims["role"].(string),
+		Exp:      int64(claims["exp"].(float64)),
 	}
 
-	user, err := s.userRepository.FindOne(filter)
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
+	return authClaims, nil
 }
 
-func (s *AuthService) ValidateRefreshToken(refreshtoken string) (*model.User, error) {
+func (s *AuthService) ValidateRefreshToken(refreshtoken string) (*model.AuthRefreshTokenClaims, error) {
 	token, err := jwt.Parse(refreshtoken, func(t *jwt.Token) (interface{}, error) {
 		_, ok := t.Method.(*jwt.SigningMethodHMAC)
 		if !ok {
@@ -166,23 +182,47 @@ func (s *AuthService) ValidateRefreshToken(refreshtoken string) (*model.User, er
 		return nil, fmt.Errorf("invalid token")
 	}
 
-	parser := jwt.Parser{}
-	token, _, err = parser.ParseUnverified(claims["token"].(string), jwt.MapClaims{})
-	if err != nil {
-		return nil, err
-	}
-
-	claims, ok = token.Claims.(jwt.MapClaims)
-	if !(ok && token.Valid) {
-		return nil, fmt.Errorf("invalid token")
-	}
-
 	filter := &model.UserFilter{
 		Id: claims["user_id"].(string),
 	}
+
 	user, err := s.userRepository.FindOne(filter)
 	if err != nil {
 		return nil, err
 	}
-	return user, nil
+
+	refreshClaims := &model.AuthRefreshTokenClaims{
+		UserId: user.Id.Hex(),
+		Exp:    int64(claims["exp"].(float64)),
+	}
+
+	return refreshClaims, nil
+}
+
+func (s *AuthService) RefreshToken(refreshToken string) (*model.AuthToken, error) {
+	refreshClaims, err := s.ValidateRefreshToken(refreshToken)
+	if err != nil {
+		return nil, err
+	}
+
+	filter := &model.UserFilter{
+		Id: refreshClaims.UserId,
+	}
+
+	user, err := s.userRepository.FindOne(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	newAccessToken, err := s.NewAccessToken(user)
+	if err != nil {
+		return nil, err
+	}
+
+	authToken := &model.AuthToken{
+		AccessToken:  *newAccessToken,
+		RefreshToken: refreshToken,
+	}
+
+	return authToken, nil
 }
