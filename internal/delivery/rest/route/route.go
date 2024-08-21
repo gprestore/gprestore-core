@@ -14,6 +14,20 @@ type Route struct {
 	AuthHandler *rest.AuthHandler
 }
 
+func New(
+	mux *http.ServeMux,
+	middleware *middleware.Middleware,
+	userHandler *rest.UserHandler,
+	authHandler *rest.AuthHandler,
+) *Route {
+	return &Route{
+		Mux:         mux,
+		Middleware:  middleware,
+		UserHandler: userHandler,
+		AuthHandler: authHandler,
+	}
+}
+
 func (r *Route) Init() {
 	r.AuthRoutes()
 	r.UserRoutes()

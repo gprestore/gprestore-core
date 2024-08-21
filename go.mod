@@ -5,6 +5,7 @@ go 1.23.0
 require (
 	github.com/go-playground/validator/v10 v10.22.0
 	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/google/wire v0.6.0
 	github.com/markbates/goth v1.80.0
 	github.com/spf13/viper v1.19.0
 	github.com/stretchr/testify v1.9.0
