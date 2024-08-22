@@ -48,17 +48,17 @@ func (r *Route) AuthRoutes() {
 }
 
 func (r *Route) UserRoutes() {
-	r.Mux.Handle("POST /user", r.Middleware.Admin(http.HandlerFunc(r.UserHandler.CreateUser)))
-	r.Mux.Handle("PATCH /user/{id}", r.Middleware.User(http.HandlerFunc(r.UserHandler.UpdateUserById)))
-	r.Mux.Handle("DELETE /user/{id}", r.Middleware.User(http.HandlerFunc(r.UserHandler.DeleteUserById)))
+	r.Mux.Handle("POST /user", r.Middleware.Admin(http.HandlerFunc(r.UserHandler.Create)))
+	r.Mux.Handle("PATCH /user/{id}", r.Middleware.User(http.HandlerFunc(r.UserHandler.UpdateById)))
+	r.Mux.Handle("DELETE /user/{id}", r.Middleware.User(http.HandlerFunc(r.UserHandler.DeleteById)))
 	r.Mux.Handle("GET /users", r.Middleware.Admin(http.HandlerFunc(r.UserHandler.FindMany)))
 	r.Mux.Handle("GET /user", r.Middleware.User(http.HandlerFunc(r.UserHandler.FindOne)))
 }
 
 func (r *Route) StoreRoutes() {
-	r.Mux.Handle("POST /store", r.Middleware.User(http.HandlerFunc(r.StoreHandler.CreateStore)))
-	r.Mux.Handle("PATCH /store/{id}", r.Middleware.User(http.HandlerFunc(r.StoreHandler.UpdateStoreById)))
-	r.Mux.Handle("DELETE /store/{id}", r.Middleware.User(http.HandlerFunc(r.StoreHandler.DeleteStoreById)))
+	r.Mux.Handle("POST /store", r.Middleware.User(http.HandlerFunc(r.StoreHandler.Create)))
+	r.Mux.Handle("PATCH /store/{id}", r.Middleware.User(http.HandlerFunc(r.StoreHandler.UpdateById)))
+	r.Mux.Handle("DELETE /store/{id}", r.Middleware.User(http.HandlerFunc(r.StoreHandler.DeleteById)))
 	r.Mux.Handle("GET /stores", r.Middleware.Guest(http.HandlerFunc(r.StoreHandler.FindMany)))
 	r.Mux.Handle("GET /store", r.Middleware.Guest(http.HandlerFunc(r.StoreHandler.FindOne)))
 }

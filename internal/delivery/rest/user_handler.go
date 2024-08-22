@@ -21,7 +21,7 @@ func NewUserHandler(service *service.UserService) *UserHandler {
 	}
 }
 
-func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var input *model.UserCreate
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
@@ -38,7 +38,7 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 	handler.SendSuccess(w, user)
 }
 
-func (h *UserHandler) UpdateUserById(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) UpdateById(w http.ResponseWriter, r *http.Request) {
 	var input *model.UserUpdate
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
@@ -78,7 +78,7 @@ func (h *UserHandler) UpdateUserById(w http.ResponseWriter, r *http.Request) {
 	handler.SendSuccess(w, user)
 }
 
-func (h *UserHandler) DeleteUserById(w http.ResponseWriter, r *http.Request) {
+func (h *UserHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
 	filter := &model.UserFilter{
 		Id: r.PathValue("id"),
 	}

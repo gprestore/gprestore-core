@@ -20,7 +20,7 @@ func NewStoreHandler(service *service.StoreService) *StoreHandler {
 	}
 }
 
-func (h *StoreHandler) CreateStore(w http.ResponseWriter, r *http.Request) {
+func (h *StoreHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var input *model.StoreCreate
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
@@ -55,7 +55,7 @@ func (h *StoreHandler) CreateStore(w http.ResponseWriter, r *http.Request) {
 	handler.SendSuccess(w, store)
 }
 
-func (h *StoreHandler) UpdateStoreById(w http.ResponseWriter, r *http.Request) {
+func (h *StoreHandler) UpdateById(w http.ResponseWriter, r *http.Request) {
 	var input *model.StoreUpdate
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
@@ -109,7 +109,7 @@ func (h *StoreHandler) UpdateStoreById(w http.ResponseWriter, r *http.Request) {
 	handler.SendSuccess(w, store)
 }
 
-func (h *StoreHandler) DeleteStoreById(w http.ResponseWriter, r *http.Request) {
+func (h *StoreHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
 	filter := &model.StoreFilter{
 		Id: r.PathValue("id"),
 	}
