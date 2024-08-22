@@ -13,6 +13,7 @@ type Route struct {
 	UserHandler  *rest.UserHandler
 	AuthHandler  *rest.AuthHandler
 	StoreHandler *rest.StoreHandler
+	ItemHandler  *rest.ItemHandler
 }
 
 func New(
@@ -21,6 +22,7 @@ func New(
 	userHandler *rest.UserHandler,
 	authHandler *rest.AuthHandler,
 	storeHandler *rest.StoreHandler,
+	itemHandler *rest.ItemHandler,
 ) *Route {
 	return &Route{
 		Mux:          mux,
@@ -28,6 +30,7 @@ func New(
 		UserHandler:  userHandler,
 		AuthHandler:  authHandler,
 		StoreHandler: storeHandler,
+		ItemHandler:  itemHandler,
 	}
 }
 
@@ -35,6 +38,7 @@ func (r *Route) Init() {
 	r.AuthRoutes()
 	r.UserRoutes()
 	r.StoreRoutes()
+	r.ItemRoutes()
 }
 
 func (r *Route) AuthRoutes() {
@@ -57,4 +61,12 @@ func (r *Route) StoreRoutes() {
 	r.Mux.Handle("DELETE /store/{id}", r.Middleware.User(http.HandlerFunc(r.StoreHandler.DeleteStoreById)))
 	r.Mux.Handle("GET /stores", r.Middleware.Guest(http.HandlerFunc(r.StoreHandler.FindMany)))
 	r.Mux.Handle("GET /store", r.Middleware.Guest(http.HandlerFunc(r.StoreHandler.FindOne)))
+}
+
+func (r *Route) ItemRoutes() {
+	r.Mux.Handle("POST /item", r.Middleware.User(http.HandlerFunc(r.ItemHandler.Create)))
+	r.Mux.Handle("PATCH /item/{id}", r.Middleware.User(http.HandlerFunc(r.ItemHandler.UpdateById)))
+	r.Mux.Handle("DELETE /item/{id}", r.Middleware.User(http.HandlerFunc(r.ItemHandler.DeleteById)))
+	r.Mux.Handle("GET /items", r.Middleware.Guest(http.HandlerFunc(r.ItemHandler.FindMany)))
+	r.Mux.Handle("GET /item", r.Middleware.Guest(http.HandlerFunc(r.ItemHandler.FindOne)))
 }

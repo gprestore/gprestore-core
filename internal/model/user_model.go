@@ -16,8 +16,8 @@ type User struct {
 	Role         string           `json:"role,omitempty" bson:"role"`
 	VerifyStatus UserVerifyStatus `json:"verify_status,omitempty" bson:"verify_status"`
 	Image        *string          `json:"image,omitempty"`
-	CreatedAt    *time.Time       `json:"createdAt,omitempty" bson:"created_at"`
-	UpdatedAt    *time.Time       `json:"updatedAt,omitempty" bson:"updated_at"`
+	CreatedAt    *time.Time       `json:"created_at,omitempty" bson:"created_at,omitempty"`
+	UpdatedAt    *time.Time       `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 }
 
 type UserVerifyStatus struct {
