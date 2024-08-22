@@ -8,6 +8,7 @@ import (
 	"github.com/gprestore/gprestore-core/internal/model"
 	"github.com/gprestore/gprestore-core/internal/service"
 	"github.com/gprestore/gprestore-core/pkg/handler"
+	"github.com/gprestore/gprestore-core/pkg/variable"
 )
 
 type UserHandler struct {
@@ -49,7 +50,26 @@ func (h *UserHandler) UpdateUserById(w http.ResponseWriter, r *http.Request) {
 		Id: r.PathValue("id"),
 	}
 
-	user, err := h.service.Update(filter, input)
+	user, err := h.service.FindOne(filter)
+	if err != nil {
+		handler.HandleError(w, err)
+		return
+	}
+
+	authClaims, ok := r.Context().Value(variable.ContextKeyUser).(*model.AuthAccessTokenClaims)
+	if !ok {
+		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+		return
+	}
+
+	// Secure Change Data
+	// Only Author or Admin can change the data
+	if !(user.Id.Hex() == authClaims.UserId || authClaims.Role == variable.ROLE_ADMIN) {
+		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+		return
+	}
+
+	user, err = h.service.Update(filter, input)
 	if err != nil {
 		handler.HandleError(w, err)
 		return
@@ -63,7 +83,26 @@ func (h *UserHandler) DeleteUserById(w http.ResponseWriter, r *http.Request) {
 		Id: r.PathValue("id"),
 	}
 
-	user, err := h.service.Delete(filter)
+	user, err := h.service.FindOne(filter)
+	if err != nil {
+		handler.HandleError(w, err)
+		return
+	}
+
+	authClaims, ok := r.Context().Value(variable.ContextKeyUser).(*model.AuthAccessTokenClaims)
+	if !ok {
+		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+		return
+	}
+
+	// Secure Delete Data
+	// Only Author or Admin can delete the data
+	if !(user.Id.Hex() == authClaims.UserId || authClaims.Role == variable.ROLE_ADMIN) {
+		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+		return
+	}
+
+	user, err = h.service.Delete(filter)
 	if err != nil {
 		handler.HandleError(w, err)
 		return
