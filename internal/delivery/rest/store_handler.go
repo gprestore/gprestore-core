@@ -7,6 +7,7 @@ import (
 	"github.com/gprestore/gprestore-core/internal/model"
 	"github.com/gprestore/gprestore-core/internal/service"
 	"github.com/gprestore/gprestore-core/pkg/handler"
+	"github.com/gprestore/gprestore-core/pkg/variable"
 )
 
 type StoreHandler struct {
@@ -25,6 +26,24 @@ func (h *StoreHandler) CreateStore(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		handler.HandleError(w, err)
 		return
+	}
+
+	authClaims, ok := r.Context().Value(variable.ContextKeyUser).(*model.AuthAccessTokenClaims)
+	if !ok {
+		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+		return
+	}
+
+	// Secure Create Store
+	// Author can create store for himself
+	// Admin can create store for anyone
+	if input.AuthorID != "" {
+		if !(input.AuthorID == authClaims.UserId || authClaims.Role == variable.ROLE_ADMIN) {
+			handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+			return
+		}
+	} else {
+		input.AuthorID = authClaims.UserId
 	}
 
 	store, err := h.service.Create(input)
@@ -48,7 +67,40 @@ func (h *StoreHandler) UpdateStoreById(w http.ResponseWriter, r *http.Request) {
 		Id: r.PathValue("id"),
 	}
 
-	store, err := h.service.Update(filter, input)
+	store, err := h.service.FindOne(filter)
+	if err != nil {
+		handler.HandleError(w, err)
+		return
+	}
+
+	authClaims, ok := r.Context().Value(variable.ContextKeyUser).(*model.AuthAccessTokenClaims)
+	if !ok {
+		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+		return
+	}
+
+	// Secure Change Data
+	// Only Author or Admin can change the data
+	if !(store.AuthorID == authClaims.UserId || authClaims.Role == variable.ROLE_ADMIN) {
+		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+		return
+	}
+
+	// Secure Change Author
+	// Only Admin can change the author
+	if input.AuthorID != "" && authClaims.Role != variable.ROLE_ADMIN {
+		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+		return
+	}
+
+	// Secure Change Badges
+	// Only Admin can change the badges
+	if input.Badges != nil && authClaims.Role != variable.ROLE_ADMIN {
+		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+		return
+	}
+
+	store, err = h.service.Update(filter, input)
 	if err != nil {
 		handler.HandleError(w, err)
 		return
@@ -62,7 +114,26 @@ func (h *StoreHandler) DeleteStoreById(w http.ResponseWriter, r *http.Request) {
 		Id: r.PathValue("id"),
 	}
 
-	store, err := h.service.Delete(filter)
+	store, err := h.service.FindOne(filter)
+	if err != nil {
+		handler.HandleError(w, err)
+		return
+	}
+
+	authClaims, ok := r.Context().Value(variable.ContextKeyUser).(*model.AuthAccessTokenClaims)
+	if !ok {
+		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+		return
+	}
+
+	// Secure Delete Data
+	// Only Author or Admin can change the data
+	if !(store.AuthorID == authClaims.UserId || authClaims.Role == variable.ROLE_ADMIN) {
+		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+		return
+	}
+
+	store, err = h.service.Delete(filter)
 	if err != nil {
 		handler.HandleError(w, err)
 		return

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
 
@@ -43,6 +44,7 @@ func NewStoreRepository(db *mongo.Database) *StoreRepository {
 func (r *StoreRepository) Create(input *model.Store) (*model.Store, error) {
 	timeNow := time.Now()
 	input.Id = primitive.NewObjectID()
+	input.Badges = make([]model.StoreBadge, 0)
 	input.CreatedAt = &timeNow
 	input.UpdatedAt = &timeNow
 
@@ -64,14 +66,26 @@ func (r *StoreRepository) Update(filter *model.StoreFilter, input *model.Store) 
 		return nil, err
 	}
 
-	_, err = r.collection.UpdateOne(context.TODO(), filterBson, bson.D{
+	result, err := r.collection.UpdateOne(context.TODO(), filterBson, bson.D{
 		{
 			Key:   "$set",
 			Value: inputBson,
 		},
 	})
+	if err != nil {
+		return nil, err
+	}
 
-	return input, err
+	if result.MatchedCount == 0 {
+		return nil, fmt.Errorf("mongo: no documents in result")
+	}
+
+	store, err := r.FindOne(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	return store, nil
 }
 
 func (r *StoreRepository) FindMany(filter *model.StoreFilter) ([]*model.Store, error) {

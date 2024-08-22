@@ -48,18 +48,13 @@ func NewUserRepository(db *mongo.Database) *UserRepository {
 
 func (r *UserRepository) Create(input *model.User) (*model.User, error) {
 	timeNow := time.Now()
+	input.Id = primitive.NewObjectID()
 	input.Role = variable.ROLE_USER
 	input.CreatedAt = &timeNow
 	input.UpdatedAt = &timeNow
 
-	result, err := r.collection.InsertOne(context.TODO(), input)
-	if err != nil {
-		return nil, err
-	}
-
-	input.Id = result.InsertedID.(primitive.ObjectID)
-
-	return input, nil
+	_, err := r.collection.InsertOne(context.TODO(), input)
+	return input, err
 }
 
 func (r *UserRepository) Update(filter *model.UserFilter, input *model.User) (*model.User, error) {

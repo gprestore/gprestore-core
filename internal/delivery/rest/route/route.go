@@ -52,9 +52,9 @@ func (r *Route) UserRoutes() {
 }
 
 func (r *Route) StoreRoutes() {
-	r.Mux.Handle("POST /store", r.Middleware.Admin(http.HandlerFunc(r.StoreHandler.CreateStore)))
+	r.Mux.Handle("POST /store", r.Middleware.User(http.HandlerFunc(r.StoreHandler.CreateStore)))
 	r.Mux.Handle("PATCH /store/{id}", r.Middleware.User(http.HandlerFunc(r.StoreHandler.UpdateStoreById)))
 	r.Mux.Handle("DELETE /store/{id}", r.Middleware.User(http.HandlerFunc(r.StoreHandler.DeleteStoreById)))
-	r.Mux.Handle("GET /stores", r.Middleware.Admin(http.HandlerFunc(r.StoreHandler.FindMany)))
-	r.Mux.Handle("GET /store", r.Middleware.User(http.HandlerFunc(r.StoreHandler.FindOne)))
+	r.Mux.Handle("GET /stores", r.Middleware.Guest(http.HandlerFunc(r.StoreHandler.FindMany)))
+	r.Mux.Handle("GET /store", r.Middleware.Guest(http.HandlerFunc(r.StoreHandler.FindOne)))
 }

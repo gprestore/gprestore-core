@@ -26,6 +26,10 @@ func HandleError(w http.ResponseWriter, err error) {
 		code = http.StatusUnauthorized
 	}
 
+	if strings.Contains(errMessage, "duplicate") {
+		code = http.StatusConflict
+	}
+
 	if err != nil {
 		SendError(w, err, code)
 	}

@@ -70,7 +70,7 @@ func (s *UserService) FindMany(filter *model.UserFilter) ([]*model.User, error) 
 func (s *UserService) FindOne(filter *model.UserFilter) (*model.User, error) {
 	isEmpty := structs.IsEmpty(filter)
 	if isEmpty {
-		return nil, variable.ErrFilter
+		return nil, variable.ErrUserFilter
 	}
 
 	err := s.validate.Struct(filter)

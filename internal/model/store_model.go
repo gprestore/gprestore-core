@@ -7,14 +7,14 @@ import (
 )
 
 type Store struct {
-	Id          primitive.ObjectID `json:"id,omitempty" bson:"_id"`
+	Id          primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
 	Slug        string             `json:"slug,omitempty" bson:"slug"`
 	Name        string             `json:"name,omitempty" bson:"name"`
 	Description string             `json:"description,omitempty" bson:"description"`
 	AuthorID    string             `json:"author_id,omitempty" bson:"author_id"`
-	Logo        string             `json:"logo,omitempty" bson:"logo"`
-	Banner      string             `json:"banner,omitempty" bson:"banner"`
-	Badges      []StoreBadge       `json:"badges,omitempty" bson:"badges"`
+	Logo        string             `json:"logo,omitempty" bson:"logo,omitempty"`
+	Banner      string             `json:"banner,omitempty" bson:"banner,omitempty"`
+	Badges      []StoreBadge       `json:"badges" bson:"badges"`
 	CreatedAt   *time.Time         `json:"created_at,omitempty" bson:"created_at"`
 	UpdatedAt   *time.Time         `json:"updated_at,omitempty" bson:"updated_at"`
 }

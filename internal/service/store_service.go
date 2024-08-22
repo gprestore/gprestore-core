@@ -70,7 +70,7 @@ func (s *StoreService) FindMany(filter *model.StoreFilter) ([]*model.Store, erro
 func (s *StoreService) FindOne(filter *model.StoreFilter) (*model.Store, error) {
 	isEmpty := structs.IsEmpty(filter)
 	if isEmpty {
-		return nil, variable.ErrFilter
+		return nil, variable.ErrStoreFilter
 	}
 
 	err := s.validate.Struct(filter)
