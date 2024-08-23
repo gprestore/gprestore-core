@@ -162,6 +162,13 @@ func (h *ItemHandler) FindMany(w http.ResponseWriter, r *http.Request) {
 		StoreId: r.URL.Query().Get("store_id"),
 	}
 
+	// Secure Find Items
+	// Store ID Required
+	if filter.StoreId == "" {
+		handler.HandleError(w, variable.ErrItemFilterStoreId)
+		return
+	}
+
 	items, err := h.service.FindMany(filter)
 	if err != nil {
 		handler.HandleError(w, err)

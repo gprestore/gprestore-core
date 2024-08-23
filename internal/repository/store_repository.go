@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/gosimple/slug"
 	"github.com/gprestore/gprestore-core/internal/model"
 	"github.com/gprestore/gprestore-core/pkg/converter"
 	"go.mongodb.org/mongo-driver/bson"
@@ -44,6 +45,7 @@ func NewStoreRepository(db *mongo.Database) *StoreRepository {
 func (r *StoreRepository) Create(input *model.Store) (*model.Store, error) {
 	timeNow := time.Now()
 	input.Id = primitive.NewObjectID()
+	input.Slug = slug.Make(input.Slug)
 	input.Badges = make([]model.StoreBadge, 0)
 	input.CreatedAt = &timeNow
 	input.UpdatedAt = &timeNow

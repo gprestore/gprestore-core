@@ -6,8 +6,10 @@ import (
 	"log"
 	"time"
 
+	"github.com/gosimple/slug"
 	"github.com/gprestore/gprestore-core/internal/model"
 	"github.com/gprestore/gprestore-core/pkg/converter"
+	"github.com/gprestore/gprestore-core/pkg/random"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -44,6 +46,7 @@ func NewItemRepository(db *mongo.Database) *ItemRepository {
 func (r *ItemRepository) Create(input *model.Item) (*model.Item, error) {
 	timeNow := time.Now()
 	input.Id = primitive.NewObjectID()
+	input.Slug = slug.Make(input.Name + " " + random.Number(5))
 	input.Categories = make([]model.ItemCategory, 0)
 	input.CreatedAt = &timeNow
 	input.UpdatedAt = &timeNow
