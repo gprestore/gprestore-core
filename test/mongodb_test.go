@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/gprestore/gprestore-core/internal/config"
-	"github.com/gprestore/gprestore-core/internal/database"
+	"github.com/gprestore/gprestore-core/internal/infrastructure/database"
 	"github.com/stretchr/testify/assert"
 )
 

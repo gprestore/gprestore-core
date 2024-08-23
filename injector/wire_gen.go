@@ -7,7 +7,7 @@
 package injector
 
 import (
-	"github.com/gprestore/gprestore-core/internal/database"
+	"github.com/gprestore/gprestore-core/internal/infrastructure/database"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest/middleware"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest/route"

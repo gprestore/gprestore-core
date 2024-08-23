@@ -12,6 +12,7 @@ Internal backend for [GPrestore](https://gprestore.net)
 | Badge    | :x:                |                                     |
 | Item     | :white_check_mark: | Image not implemented yet           |
 | Category | :x:                |                                     |
-| Stock    | :x:                |                                     |
+| Stock    | :white_check_mark: | Update Stock not implemented yet    |
 | Order    | :x:                |                                     |
 | Payment  | :x:                |                                     |
+| RabbitMQ | :white_check_mark: | Basic Setup Email Notification      |

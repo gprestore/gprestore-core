@@ -1,2 +1,4 @@
 - Store Detail with Items
 - Item Detail with Stock count
+- Stock Content Update
+- Send Email RabbitMQ
