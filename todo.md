@@ -1,0 +1,2 @@
+- Store Detail with Items
+- Item Detail with Stock count
