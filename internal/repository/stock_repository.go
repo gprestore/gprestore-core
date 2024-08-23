@@ -23,7 +23,7 @@ func NewStockRepository(db *mongo.Database) *StockRepository {
 	collection := db.Collection("stocks")
 	_, err := collection.Indexes().CreateMany(context.TODO(), []mongo.IndexModel{
 		{
-			Keys:    bson.D{{Key: "slug", Value: 1}},
+			Keys:    bson.D{{Key: "item_id", Value: 1}},
 			Options: options.Index().SetUnique(true).SetSparse(true),
 		},
 		{

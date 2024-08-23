@@ -14,6 +14,7 @@ type Route struct {
 	AuthHandler  *rest.AuthHandler
 	StoreHandler *rest.StoreHandler
 	ItemHandler  *rest.ItemHandler
+	StockHandler *rest.StockHandler
 }
 
 func New(
@@ -23,6 +24,7 @@ func New(
 	authHandler *rest.AuthHandler,
 	storeHandler *rest.StoreHandler,
 	itemHandler *rest.ItemHandler,
+	stockHandler *rest.StockHandler,
 ) *Route {
 	return &Route{
 		Mux:          mux,
@@ -31,6 +33,7 @@ func New(
 		AuthHandler:  authHandler,
 		StoreHandler: storeHandler,
 		ItemHandler:  itemHandler,
+		StockHandler: stockHandler,
 	}
 }
 
@@ -39,6 +42,7 @@ func (r *Route) Init() {
 	r.UserRoutes()
 	r.StoreRoutes()
 	r.ItemRoutes()
+	r.StockRoutes()
 }
 
 func (r *Route) AuthRoutes() {
@@ -69,4 +73,12 @@ func (r *Route) ItemRoutes() {
 	r.Mux.Handle("DELETE /item/{id}", r.Middleware.User(http.HandlerFunc(r.ItemHandler.DeleteById)))
 	r.Mux.Handle("GET /items", r.Middleware.Guest(http.HandlerFunc(r.ItemHandler.FindMany)))
 	r.Mux.Handle("GET /item", r.Middleware.Guest(http.HandlerFunc(r.ItemHandler.FindOne)))
+}
+
+func (r *Route) StockRoutes() {
+	r.Mux.Handle("POST /stock", r.Middleware.User(http.HandlerFunc(r.StockHandler.Create)))
+	r.Mux.Handle("PATCH /stock/{id}", r.Middleware.User(http.HandlerFunc(r.StockHandler.UpdateById)))
+	r.Mux.Handle("DELETE /stock/{id}", r.Middleware.User(http.HandlerFunc(r.StockHandler.DeleteById)))
+	r.Mux.Handle("GET /stocks", r.Middleware.Guest(http.HandlerFunc(r.StockHandler.FindMany)))
+	r.Mux.Handle("GET /stock", r.Middleware.Guest(http.HandlerFunc(r.StockHandler.FindOne)))
 }

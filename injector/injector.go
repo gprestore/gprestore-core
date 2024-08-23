@@ -38,6 +38,10 @@ func InjectRoute() *route.Route {
 		service.NewItemService,
 		rest.NewItemHandler,
 
+		repository.NewStockRepository,
+		service.NewStockService,
+		rest.NewStockHandler,
+
 		route.New,
 	)
 
