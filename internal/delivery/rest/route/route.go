@@ -79,6 +79,6 @@ func (r *Route) StockRoutes() {
 	r.Mux.Handle("POST /stock", r.Middleware.User(http.HandlerFunc(r.StockHandler.Create)))
 	r.Mux.Handle("PATCH /stock/{id}", r.Middleware.User(http.HandlerFunc(r.StockHandler.UpdateById)))
 	r.Mux.Handle("DELETE /stock/{id}", r.Middleware.User(http.HandlerFunc(r.StockHandler.DeleteById)))
-	r.Mux.Handle("GET /stocks", r.Middleware.Guest(http.HandlerFunc(r.StockHandler.FindMany)))
-	r.Mux.Handle("GET /stock", r.Middleware.Guest(http.HandlerFunc(r.StockHandler.FindOne)))
+	r.Mux.Handle("GET /stocks", r.Middleware.Admin(http.HandlerFunc(r.StockHandler.FindMany)))
+	r.Mux.Handle("GET /stock", r.Middleware.User(http.HandlerFunc(r.StockHandler.FindOne)))
 }

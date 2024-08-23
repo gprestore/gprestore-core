@@ -10,14 +10,16 @@ import (
 )
 
 type StockService struct {
-	repository *repository.StockRepository
-	validate   *validator.Validate
+	repository     *repository.StockRepository
+	itemRepository *repository.ItemRepository
+	validate       *validator.Validate
 }
 
-func NewStockService(repository *repository.StockRepository, validate *validator.Validate) *StockService {
+func NewStockService(repository *repository.StockRepository, itemRepository *repository.ItemRepository, validate *validator.Validate) *StockService {
 	return &StockService{
-		repository: repository,
-		validate:   validate,
+		repository:     repository,
+		itemRepository: itemRepository,
+		validate:       validate,
 	}
 }
 
@@ -32,8 +34,8 @@ func (s *StockService) Create(input *model.StockCreate) (*model.Stock, error) {
 		return nil, err
 	}
 
-	item, err := s.repository.Create(inputStock)
-	return item, err
+	stock, err := s.repository.Create(inputStock)
+	return stock, err
 }
 
 func (s *StockService) Update(filter *model.StockFilter, input *model.StockUpdate) (*model.Stock, error) {
@@ -47,8 +49,30 @@ func (s *StockService) Update(filter *model.StockFilter, input *model.StockUpdat
 		return nil, err
 	}
 
-	item, err := s.repository.Update(filter, inputStock)
-	return item, err
+	stock, err := s.repository.Update(filter, inputStock)
+	if err != nil {
+		return nil, err
+	}
+
+	itemFilter := &model.ItemFilter{
+		Id: stock.ItemId,
+	}
+
+	itemUpdate := &model.ItemUpdate{
+		StockCount: stock.Count,
+	}
+
+	itemInput, err := converter.StructConverter[model.Item](itemUpdate)
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = s.itemRepository.Update(itemFilter, itemInput)
+	if err != nil {
+		return nil, err
+	}
+
+	return stock, nil
 }
 
 func (s *StockService) FindMany(filter *model.StockFilter) ([]*model.Stock, error) {
@@ -64,7 +88,6 @@ func (s *StockService) FindMany(filter *model.StockFilter) ([]*model.Stock, erro
 
 	stores, err := s.repository.FindMany(filter)
 	return stores, err
-
 }
 
 func (s *StockService) FindOne(filter *model.StockFilter) (*model.Stock, error) {
@@ -78,8 +101,8 @@ func (s *StockService) FindOne(filter *model.StockFilter) (*model.Stock, error) 
 		return nil, err
 	}
 
-	item, err := s.repository.FindOne(filter)
-	return item, err
+	stock, err := s.repository.FindOne(filter)
+	return stock, err
 }
 
 func (s *StockService) Delete(filter *model.StockFilter) (*model.Stock, error) {
@@ -88,6 +111,6 @@ func (s *StockService) Delete(filter *model.StockFilter) (*model.Stock, error) {
 		return nil, err
 	}
 
-	item, err := s.repository.Delete(filter)
-	return item, err
+	stock, err := s.repository.Delete(filter)
+	return stock, err
 }

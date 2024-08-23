@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/gprestore/gprestore-core/internal/model"
@@ -44,7 +45,6 @@ func NewStockRepository(db *mongo.Database) *StockRepository {
 func (r *StockRepository) Create(input *model.Stock) (*model.Stock, error) {
 	timeNow := time.Now()
 	input.Id = primitive.NewObjectID()
-	input.Contents = make([]string, 0)
 	input.CreatedAt = &timeNow
 	input.UpdatedAt = &timeNow
 
@@ -56,6 +56,26 @@ func (r *StockRepository) Update(filter *model.StockFilter, input *model.Stock) 
 	filterBson, err := converter.InputToBson(filter)
 	if err != nil {
 		return nil, err
+	}
+
+	stock, err := r.FindOne(filter)
+	if err != nil {
+		return nil, err
+	}
+
+	if input.Contents == nil {
+
+	} else if input.Separator != "" && *input.Contents == "" {
+		splittedContents := strings.Split(*stock.Contents, input.Separator)
+		input.Count = len(splittedContents)
+	} else if input.Separator == "" && *input.Contents != "" {
+		splittedContents := strings.Split(*input.Contents, stock.Separator)
+		input.Count = len(splittedContents)
+	} else if input.Separator != "" && *input.Contents != "" {
+		splittedContents := strings.Split(*input.Contents, input.Separator)
+		input.Count = len(splittedContents)
+	} else if *input.Contents == "" {
+		input.Count = 0
 	}
 
 	timeNow := time.Now()
@@ -80,7 +100,7 @@ func (r *StockRepository) Update(filter *model.StockFilter, input *model.Stock) 
 		return nil, fmt.Errorf("mongo: no documents in result")
 	}
 
-	stock, err := r.FindOne(filter)
+	stock, err = r.FindOne(filter)
 	if err != nil {
 		return nil, err
 	}
@@ -138,4 +158,15 @@ func (r *StockRepository) Delete(filter *model.StockFilter) (*model.Stock, error
 	_, err = r.collection.DeleteOne(context.TODO(), filterBson)
 
 	return stock, err
+}
+
+func (r *StockRepository) StockCount(filter *model.StockFilter) (int, error) {
+	filterBson, err := converter.InputToBson(filter)
+	if err != nil {
+		return 0, err
+	}
+
+	stockCount, err := r.collection.CountDocuments(context.TODO(), filterBson)
+
+	return int(stockCount), err
 }

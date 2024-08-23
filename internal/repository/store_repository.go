@@ -46,7 +46,7 @@ func (r *StoreRepository) Create(input *model.Store) (*model.Store, error) {
 	timeNow := time.Now()
 	input.Id = primitive.NewObjectID()
 	input.Slug = slug.Make(input.Slug)
-	input.Badges = make([]model.StoreBadge, 0)
+	input.Badges = make([]*model.StoreBadge, 0)
 	input.CreatedAt = &timeNow
 	input.UpdatedAt = &timeNow
 

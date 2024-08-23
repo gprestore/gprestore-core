@@ -10,14 +10,16 @@ import (
 )
 
 type ItemService struct {
-	repository *repository.ItemRepository
-	validate   *validator.Validate
+	repository      *repository.ItemRepository
+	stockRepository *repository.StockRepository
+	validate        *validator.Validate
 }
 
-func NewItemService(repository *repository.ItemRepository, validate *validator.Validate) *ItemService {
+func NewItemService(repository *repository.ItemRepository, stockRepository *repository.StockRepository, validate *validator.Validate) *ItemService {
 	return &ItemService{
-		repository: repository,
-		validate:   validate,
+		repository:      repository,
+		stockRepository: stockRepository,
+		validate:        validate,
 	}
 }
 
@@ -33,7 +35,11 @@ func (s *ItemService) Create(input *model.ItemCreate) (*model.Item, error) {
 	}
 
 	item, err := s.repository.Create(inputItem)
-	return item, err
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 func (s *ItemService) Update(filter *model.ItemFilter, input *model.ItemUpdate) (*model.Item, error) {
@@ -64,7 +70,6 @@ func (s *ItemService) FindMany(filter *model.ItemFilter) ([]*model.Item, error) 
 
 	stores, err := s.repository.FindMany(filter)
 	return stores, err
-
 }
 
 func (s *ItemService) FindOne(filter *model.ItemFilter) (*model.Item, error) {
@@ -79,7 +84,11 @@ func (s *ItemService) FindOne(filter *model.ItemFilter) (*model.Item, error) {
 	}
 
 	item, err := s.repository.FindOne(filter)
-	return item, err
+	if err != nil {
+		return nil, err
+	}
+
+	return item, nil
 }
 
 func (s *ItemService) Delete(filter *model.ItemFilter) (*model.Item, error) {

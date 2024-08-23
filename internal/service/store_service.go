@@ -79,6 +79,9 @@ func (s *StoreService) FindOne(filter *model.StoreFilter) (*model.Store, error) 
 	}
 
 	store, err := s.repository.FindOne(filter)
+	if err != nil {
+		return nil, err
+	}
 	return store, err
 }
 

@@ -14,8 +14,7 @@ type Store struct {
 	AuthorID    string             `json:"author_id,omitempty" bson:"author_id"`
 	Logo        string             `json:"logo,omitempty" bson:"logo,omitempty"`
 	Banner      string             `json:"banner,omitempty" bson:"banner,omitempty"`
-	Badges      []StoreBadge       `json:"badges" bson:"badges"`
-	Items       []Item             `json:"items,omitempty" bson:"-"`
+	Badges      []*StoreBadge      `json:"badges" bson:"badges"`
 	CreatedAt   *time.Time         `json:"created_at,omitempty" bson:"created_at"`
 	UpdatedAt   *time.Time         `json:"updated_at,omitempty" bson:"updated_at"`
 }

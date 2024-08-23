@@ -7,10 +7,10 @@
 package injector
 
 import (
-	"github.com/gprestore/gprestore-core/internal/infrastructure/database"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest/middleware"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest/route"
+	"github.com/gprestore/gprestore-core/internal/infrastructure/database"
 	"github.com/gprestore/gprestore-core/internal/repository"
 	"github.com/gprestore/gprestore-core/internal/service"
 	"github.com/gprestore/gprestore-core/internal/validation"
@@ -33,10 +33,10 @@ func InjectRoute() *route.Route {
 	storeService := service.NewStoreService(storeRepository, validate)
 	storeHandler := rest.NewStoreHandler(storeService)
 	itemRepository := repository.NewItemRepository(mongoDatabase)
-	itemService := service.NewItemService(itemRepository, validate)
-	itemHandler := rest.NewItemHandler(itemService, storeService)
 	stockRepository := repository.NewStockRepository(mongoDatabase)
-	stockService := service.NewStockService(stockRepository, validate)
+	itemService := service.NewItemService(itemRepository, stockRepository, validate)
+	itemHandler := rest.NewItemHandler(itemService, storeService)
+	stockService := service.NewStockService(stockRepository, itemRepository, validate)
 	stockHandler := rest.NewStockHandler(stockService, storeService)
 	routeRoute := route.New(serveMux, middlewareMiddleware, userHandler, authHandler, storeHandler, itemHandler, stockHandler)
 	return routeRoute
