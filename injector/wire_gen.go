@@ -7,6 +7,7 @@
 package injector
 
 import (
+	"github.com/gprestore/gprestore-core/internal/delivery/mq"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest/middleware"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest/route"
@@ -40,4 +41,10 @@ func InjectRoute() *route.Route {
 	stockHandler := rest.NewStockHandler(stockService, storeService)
 	routeRoute := route.New(serveMux, middlewareMiddleware, userHandler, authHandler, storeHandler, itemHandler, stockHandler)
 	return routeRoute
+}
+
+func InjectConsumer() *mq.Consumer {
+	mailService := service.NewMailService()
+	consumer := mq.NewConsumer(mailService)
+	return consumer
 }

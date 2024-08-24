@@ -16,6 +16,14 @@ func main() {
 	route := injector.InjectRoute()
 	route.Init()
 
+	consumer := injector.InjectConsumer()
+	go func() {
+		err := consumer.ConsumeNotificationEmail()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+
 	port := viper.GetString("server.port")
 	log.Printf("Running on http://localhost:%v", port)
 	http.ListenAndServe(fmt.Sprintf(":%v", port), route.Mux)

@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/google/wire"
+	"github.com/gprestore/gprestore-core/internal/delivery/mq"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest/middleware"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest/route"
@@ -43,6 +44,15 @@ func InjectRoute() *route.Route {
 		rest.NewStockHandler,
 
 		route.New,
+	)
+
+	return nil
+}
+
+func InjectConsumer() *mq.Consumer {
+	wire.Build(
+		service.NewMailService,
+		mq.NewConsumer,
 	)
 
 	return nil

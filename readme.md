@@ -15,4 +15,5 @@ Internal backend for [GPrestore](https://gprestore.net)
 | Stock    | :white_check_mark: |                                     |
 | Order    | :x:                |                                     |
 | Payment  | :x:                |                                     |
-| RabbitMQ | :white_check_mark: | Basic Setup Email Notification      |
+| RabbitMQ | :white_check_mark: |                                     |
+| Mail     | :white_check_mark: |                                     |

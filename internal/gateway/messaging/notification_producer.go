@@ -9,7 +9,7 @@ import (
 	"github.com/rabbitmq/amqp091-go"
 )
 
-func PublishNotification(notification *model.Notification) error {
+func PublishNotificationEmail(mail *model.Mail) error {
 	conn, err := messaging.DialRabbitMQ()
 	if err != nil {
 		return err
@@ -24,13 +24,13 @@ func PublishNotification(notification *model.Notification) error {
 
 	ctx := context.Background()
 
-	notificationJson, err := json.Marshal(notification)
+	mailJson, err := json.Marshal(mail)
 	if err != nil {
 		return err
 	}
 
 	message := amqp091.Publishing{
-		Body: notificationJson,
+		Body: mailJson,
 	}
 
 	return channel.PublishWithContext(ctx, "notification", "email", false, false, message)

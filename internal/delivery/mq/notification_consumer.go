@@ -2,12 +2,14 @@ package mq
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 
 	"github.com/gprestore/gprestore-core/internal/infrastructure/messaging"
+	"github.com/gprestore/gprestore-core/internal/model"
 )
 
-func ConsumeNotificationEmail() error {
+func (c *Consumer) ConsumeNotificationEmail() error {
 	conn, err := messaging.DialRabbitMQ()
 	if err != nil {
 		return err
@@ -27,8 +29,19 @@ func ConsumeNotificationEmail() error {
 		return err
 	}
 
+	log.Println("Consumer: Consuming Email...")
+
 	for message := range emailConsumer {
-		log.Println(string(message.Body))
+		var mail *model.Mail
+		err := json.Unmarshal(message.Body, &mail)
+		if err != nil {
+			return err
+		}
+
+		err = c.mailService.Send(mail)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

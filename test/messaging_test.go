@@ -8,6 +8,7 @@ import (
 	"github.com/gprestore/gprestore-core/internal/delivery/mq"
 	"github.com/gprestore/gprestore-core/internal/gateway/messaging"
 	"github.com/gprestore/gprestore-core/internal/model"
+	"github.com/gprestore/gprestore-core/internal/service"
 )
 
 func init() {
@@ -15,22 +16,23 @@ func init() {
 }
 
 func TestPublisher(t *testing.T) {
-	err := messaging.PublishNotification(&model.Notification{
-		Title:        "Judul",
-		ShortContent: "Deskripsi Singkat",
-		Content:      "Deskripsi Panjang",
-		Target: model.NotificationTarget{
-			Email: "agilistikmal3@gmail.com",
-		},
+	err := messaging.PublishNotificationEmail(&model.Mail{
+		From:    "testing@safatanc.com",
+		To:      []string{"agilistikmal3@gmail.com"},
+		Subject: "RabbitMQ Testing",
+		Body:    "This is rabbitmq testing for gprestore-core",
 	})
 
 	if err != nil {
 		log.Fatal(err)
 	}
+	log.Println("Publishing message")
 }
 
 func TestConsumer(t *testing.T) {
-	err := mq.ConsumeNotificationEmail()
+	s := service.NewMailService()
+	consumer := mq.NewConsumer(s)
+	err := consumer.ConsumeNotificationEmail()
 	if err != nil {
 		log.Fatal(err)
 	}
