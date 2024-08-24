@@ -8,14 +8,15 @@ import (
 )
 
 type Route struct {
-	Mux          *http.ServeMux
-	Middleware   *middleware.Middleware
-	UserHandler  *rest.UserHandler
-	AuthHandler  *rest.AuthHandler
-	StoreHandler *rest.StoreHandler
-	ItemHandler  *rest.ItemHandler
-	StockHandler *rest.StockHandler
-	OrderHandler *rest.OrderHandler
+	Mux            *http.ServeMux
+	Middleware     *middleware.Middleware
+	UserHandler    *rest.UserHandler
+	AuthHandler    *rest.AuthHandler
+	StoreHandler   *rest.StoreHandler
+	ItemHandler    *rest.ItemHandler
+	StockHandler   *rest.StockHandler
+	OrderHandler   *rest.OrderHandler
+	PaymentHandler *rest.PaymentHandler
 }
 
 func New(
@@ -27,16 +28,18 @@ func New(
 	itemHandler *rest.ItemHandler,
 	stockHandler *rest.StockHandler,
 	orderHandler *rest.OrderHandler,
+	paymentHandler *rest.PaymentHandler,
 ) *Route {
 	return &Route{
-		Mux:          mux,
-		Middleware:   middleware,
-		UserHandler:  userHandler,
-		AuthHandler:  authHandler,
-		StoreHandler: storeHandler,
-		ItemHandler:  itemHandler,
-		StockHandler: stockHandler,
-		OrderHandler: orderHandler,
+		Mux:            mux,
+		Middleware:     middleware,
+		UserHandler:    userHandler,
+		AuthHandler:    authHandler,
+		StoreHandler:   storeHandler,
+		ItemHandler:    itemHandler,
+		StockHandler:   stockHandler,
+		OrderHandler:   orderHandler,
+		PaymentHandler: paymentHandler,
 	}
 }
 
@@ -47,6 +50,7 @@ func (r *Route) Init() {
 	r.ItemRoutes()
 	r.StockRoutes()
 	r.OrderRoutes()
+	r.PaymentRoutes()
 }
 
 func (r *Route) AuthRoutes() {
@@ -91,4 +95,8 @@ func (r *Route) OrderRoutes() {
 	r.Mux.Handle("DELETE /order/{id}", r.Middleware.User(http.HandlerFunc(r.OrderHandler.DeleteById)))
 	r.Mux.Handle("GET /orders", r.Middleware.Guest(http.HandlerFunc(r.OrderHandler.FindMany)))
 	r.Mux.Handle("GET /order", r.Middleware.Guest(http.HandlerFunc(r.OrderHandler.FindOne)))
+}
+
+func (r *Route) PaymentRoutes() {
+	r.Mux.Handle("GET /payment/channels", r.Middleware.Guest(http.HandlerFunc(r.PaymentHandler.FindPaymentChannels)))
 }

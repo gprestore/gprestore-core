@@ -34,6 +34,15 @@ type OrderCustomer struct {
 	Email string `validate:"required,email" json:"email,omitempty" bson:"email,omitempty"`
 }
 
+type OrderPayment struct {
+	Id            string
+	Reference     string
+	Channel       string
+	AccountNumber string
+	QrisString    string
+	Status        string
+}
+
 type OrderFee struct {
 	Name   string `json:"name,omitempty" bson:"name,omitempty"`
 	Amount int    `json:"amount,omitempty" bson:"amount,omitempty"`

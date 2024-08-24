@@ -47,6 +47,9 @@ func InjectRoute() *route.Route {
 		service.NewOrderService,
 		rest.NewOrderHandler,
 
+		service.NewPaymentService,
+		rest.NewPaymentHandler,
+
 		route.New,
 	)
 
