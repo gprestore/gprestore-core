@@ -1,2 +1,2 @@
-- Create Order
 - Select Payment
+- Update Order with Payment

@@ -14,6 +14,7 @@ type Order struct {
 	Code      string             `json:"code,omitempty" bson:"code,omitempty"`
 	StoreId   string             `json:"store_id,omitempty" bson:"store_id,omitempty"`
 	Items     []OrderItem        `json:"items,omitempty" bson:"items,omitempty"`
+	Fees      []OrderFee         `json:"fees,omitempty" bson:"fees,omitempty"`
 	Customer  OrderCustomer      `json:"customer,omitempty" bson:"customer,omitempty"`
 	Subtotal  int                `json:"subtotal,omitempty" bson:"subtotal,omitempty"`
 	Status    OrderStatus        `json:"status,omitempty" bson:"status,omitempty"`
@@ -31,6 +32,11 @@ type OrderItem struct {
 type OrderCustomer struct {
 	Name  string `validate:"required,min=3" json:"name,omitempty" bson:"name,omitempty"`
 	Email string `validate:"required,email" json:"email,omitempty" bson:"email,omitempty"`
+}
+
+type OrderFee struct {
+	Name   string `json:"name,omitempty" bson:"name,omitempty"`
+	Amount int    `json:"amount,omitempty" bson:"amount,omitempty"`
 }
 
 type OrderCreate struct {

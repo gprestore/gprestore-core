@@ -13,7 +13,7 @@ Internal backend for [GPrestore](https://gprestore.net)
 | Item     | :white_check_mark: | Image not implemented yet           |
 | Category | :x:                |                                     |
 | Stock    | :white_check_mark: |                                     |
-| Order    | :x:                |                                     |
+| Order    | :white_check_mark: |                                     |
 | Payment  | :x:                |                                     |
 | RabbitMQ | :white_check_mark: |                                     |
 | Mail     | :white_check_mark: |                                     |

@@ -9,6 +9,7 @@ import (
 	"github.com/gprestore/gprestore-core/internal/model"
 	"github.com/gprestore/gprestore-core/pkg/converter"
 	"github.com/gprestore/gprestore-core/pkg/variable"
+	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -43,9 +44,24 @@ func NewOrderRepository(db *mongo.Database) *OrderRepository {
 }
 
 func (r *OrderRepository) Create(input *model.Order) (*model.Order, error) {
+	var serviceFeeAmount int
+	serviceFeeType := viper.GetString("fee.service.type")
+	serviceFeeValue := viper.GetInt("fee.service.value")
+	if serviceFeeType == variable.ORDER_FEE_FLAT {
+		serviceFeeAmount = serviceFeeValue
+	} else if serviceFeeType == variable.ORDER_FEE_PERCENT {
+		serviceFeeAmount = serviceFeeValue
+	}
+
 	timeNow := time.Now()
 	input.Id = primitive.NewObjectID()
 	input.Status = variable.ORDER_AWAITING_PAYMENT
+	input.Fees = []model.OrderFee{
+		{
+			Name:   "Service Fee",
+			Amount: serviceFeeAmount,
+		},
+	}
 	input.CreatedAt = &timeNow
 	input.UpdatedAt = &timeNow
 
