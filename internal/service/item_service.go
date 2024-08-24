@@ -97,6 +97,15 @@ func (s *ItemService) Delete(filter *model.ItemFilter) (*model.Item, error) {
 		return nil, err
 	}
 
+	stockFilter := &model.StockFilter{
+		ItemId: filter.Id,
+	}
+
+	_, err = s.stockRepository.Delete(stockFilter)
+	if err != nil {
+		return nil, err
+	}
+
 	item, err := s.repository.Delete(filter)
 	return item, err
 }

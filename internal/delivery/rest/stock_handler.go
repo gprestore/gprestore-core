@@ -118,66 +118,6 @@ func (h *StockHandler) UpdateById(w http.ResponseWriter, r *http.Request) {
 	handler.SendSuccess(w, stock)
 }
 
-func (h *StockHandler) DeleteById(w http.ResponseWriter, r *http.Request) {
-	authClaims, ok := r.Context().Value(variable.ContextKeyUser).(*model.AuthAccessTokenClaims)
-	if !ok {
-		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
-		return
-	}
-
-	storeFilter := &model.StoreFilter{
-		AuthorID: authClaims.UserId,
-	}
-
-	store, err := h.storeService.FindOne(storeFilter)
-	if err != nil {
-		handler.HandleError(w, err)
-		return
-	}
-
-	// Secure Delete Data
-	// Only Author or Admin can delete the data
-	if !(store.AuthorID == authClaims.UserId || authClaims.Role == variable.ROLE_ADMIN) {
-		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
-		return
-	}
-
-	filter := &model.StockFilter{
-		Id: r.PathValue("id"),
-	}
-
-	stock, err := h.service.Delete(filter)
-	if err != nil {
-		handler.HandleError(w, err)
-		return
-	}
-
-	handler.SendSuccess(w, stock)
-}
-
-func (h *StockHandler) FindMany(w http.ResponseWriter, r *http.Request) {
-	filter := &model.StockFilter{
-		Id:      r.URL.Query().Get("id"),
-		StoreId: r.URL.Query().Get("store_id"),
-		ItemId:  r.URL.Query().Get("item_id"),
-	}
-
-	// Secure Find Stocks
-	// Item ID Required
-	if filter.ItemId == "" {
-		handler.HandleError(w, variable.ErrStockFilterItemId)
-		return
-	}
-
-	stocks, err := h.service.FindMany(filter)
-	if err != nil {
-		handler.HandleError(w, err)
-		return
-	}
-
-	handler.SendSuccess(w, stocks)
-}
-
 func (h *StockHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 	filter := &model.StockFilter{
 		Id:      r.URL.Query().Get("id"),

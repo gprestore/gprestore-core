@@ -14,7 +14,7 @@ type Item struct {
 	Description string             `json:"description,omitempty" bson:"description,omitempty"`
 	Price       int                `json:"price,omitempty" bson:"price,omitempty"`
 	Categories  []ItemCategory     `json:"categories" bson:"categories"`
-	StockCount  int                `json:"stock_count" bson:"stock_count,omitempty"`
+	StockCount  *int               `json:"stock_count" bson:"stock_count,omitempty"`
 	CreatedAt   *time.Time         `json:"created_at,omitempty" bson:"created_at,omitempty"`
 	UpdatedAt   *time.Time         `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 }
@@ -38,7 +38,6 @@ type ItemUpdate struct {
 	Name        string         `validate:"omitempty,min=3" json:"name,omitempty" bson:"name,omitempty"`
 	Description string         `validate:"omitempty,min=8" json:"description,omitempty" bson:"description,omitempty"`
 	Categories  []ItemCategory `json:"categories,omitempty" bson:"categories,omitempty"`
-	StockCount  int            `json:"stock_count" bson:"stock_count,omitempty"`
 	Price       int            `validate:"omitempty,min=1000" json:"price,omitempty" bson:"price,omitempty"`
 }
 

@@ -58,8 +58,8 @@ func (s *StockService) Update(filter *model.StockFilter, input *model.StockUpdat
 		Id: stock.ItemId,
 	}
 
-	itemUpdate := &model.ItemUpdate{
-		StockCount: stock.Count,
+	itemUpdate := &model.Item{
+		StockCount: &stock.Count,
 	}
 
 	itemInput, err := converter.StructConverter[model.Item](itemUpdate)
@@ -75,21 +75,6 @@ func (s *StockService) Update(filter *model.StockFilter, input *model.StockUpdat
 	return stock, nil
 }
 
-func (s *StockService) FindMany(filter *model.StockFilter) ([]*model.Stock, error) {
-	err := s.validate.Struct(filter)
-	if err != nil {
-		return nil, err
-	}
-
-	isEmpty := structs.IsEmpty(filter)
-	if isEmpty {
-		filter = nil
-	}
-
-	stores, err := s.repository.FindMany(filter)
-	return stores, err
-}
-
 func (s *StockService) FindOne(filter *model.StockFilter) (*model.Stock, error) {
 	isEmpty := structs.IsEmpty(filter)
 	if isEmpty {
@@ -102,15 +87,5 @@ func (s *StockService) FindOne(filter *model.StockFilter) (*model.Stock, error) 
 	}
 
 	stock, err := s.repository.FindOne(filter)
-	return stock, err
-}
-
-func (s *StockService) Delete(filter *model.StockFilter) (*model.Stock, error) {
-	err := s.validate.Struct(filter)
-	if err != nil {
-		return nil, err
-	}
-
-	stock, err := s.repository.Delete(filter)
 	return stock, err
 }
