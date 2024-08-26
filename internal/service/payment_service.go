@@ -37,7 +37,7 @@ func (s *PaymentService) CreateInvoice(order *model.Order) (*invoice.Invoice, er
 	return resp, nil
 }
 
-func (s *PaymentService) CreatePayment(order *model.Order, paymentMethodType payment_method.PaymentMethodType) (*payment_request.PaymentRequest, error) {
+func (s *PaymentService) CreatePayment(order *model.Order) (*payment_request.PaymentMethod, error) {
 	amount := float64(order.Subtotal)
 	var xenditItems []payment_request.PaymentRequestBasketItem
 	for _, item := range order.Items {
@@ -56,15 +56,15 @@ func (s *PaymentService) CreatePayment(order *model.Order, paymentMethodType pay
 		ReferenceId: &order.Code,
 		Amount:      &amount,
 		Currency:    payment_request.PAYMENTREQUESTCURRENCY_IDR,
-		PaymentMethod: &payment_request.PaymentMethodParameters{
-			Type:        payment_request.PaymentMethodType(paymentMethodType),
-			Reusability: payment_request.PAYMENTMETHODREUSABILITY_ONE_TIME_USE,
-		},
-		Items: xenditItems,
+		Items:       xenditItems,
 		Metadata: map[string]interface{}{
 			"name":  order.Customer.Name,
 			"email": order.Customer.Email,
 		},
+		PaymentMethod: payment_request.NewPaymentMethodParameters(
+			payment_request.PAYMENTMETHODTYPE_QR_CODE,
+			payment_request.PAYMENTMETHODREUSABILITY_ONE_TIME_USE,
+		),
 	}
 
 	resp, _, err := s.xenditClient.PaymentRequestApi.CreatePaymentRequest(context.Background()).PaymentRequestParameters(request).Execute()
@@ -72,7 +72,7 @@ func (s *PaymentService) CreatePayment(order *model.Order, paymentMethodType pay
 		return nil, err
 	}
 
-	return resp, nil
+	return &resp.PaymentMethod, nil
 }
 
 func (s *PaymentService) GetPaymentMethods() ([]payment_method.PaymentMethod, error) {

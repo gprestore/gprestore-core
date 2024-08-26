@@ -3,6 +3,8 @@ package model
 import (
 	"time"
 
+	"github.com/xendit/xendit-go/v6/payment_method"
+	"github.com/xendit/xendit-go/v6/payment_request"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -10,16 +12,19 @@ import (
 type OrderStatus string
 
 type Order struct {
-	Id        primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
-	Code      string             `json:"code,omitempty" bson:"code,omitempty"`
-	StoreId   string             `json:"store_id,omitempty" bson:"store_id,omitempty"`
-	Items     []OrderItem        `json:"items,omitempty" bson:"items,omitempty"`
-	Fees      []OrderFee         `json:"fees,omitempty" bson:"fees,omitempty"`
-	Customer  OrderCustomer      `json:"customer,omitempty" bson:"customer,omitempty"`
-	Subtotal  int                `json:"subtotal,omitempty" bson:"subtotal,omitempty"`
-	Status    OrderStatus        `json:"status,omitempty" bson:"status,omitempty"`
-	CreatedAt *time.Time         `json:"created_at,omitempty" bson:"created_at,omitempty"`
-	UpdatedAt *time.Time         `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
+	Id      primitive.ObjectID `json:"id,omitempty" bson:"_id,omitempty"`
+	Code    string             `json:"code,omitempty" bson:"code,omitempty"`
+	StoreId string             `json:"store_id,omitempty" bson:"store_id,omitempty"`
+	Items   []OrderItem        `json:"items,omitempty" bson:"items,omitempty"`
+	// CARD, DIRECT_DEBIT, EWALLET, OVER_THE_COUNTER, QR_CODE, VIRTUAL_ACCOUNT
+	PaymentType    payment_method.PaymentMethodType `json:"payment_type,omitempty" bson:"payment_type,omitempty"`
+	PaymentChannel *payment_request.PaymentMethod   `json:"payment_channel,omitempty" bson:"payment_channel,omitempty"`
+	Fees           []OrderFee                       `json:"fees,omitempty" bson:"fees,omitempty"`
+	Customer       OrderCustomer                    `json:"customer,omitempty" bson:"customer,omitempty"`
+	Subtotal       int                              `json:"subtotal,omitempty" bson:"subtotal,omitempty"`
+	Status         OrderStatus                      `json:"status,omitempty" bson:"status,omitempty"`
+	CreatedAt      *time.Time                       `json:"created_at,omitempty" bson:"created_at,omitempty"`
+	UpdatedAt      *time.Time                       `json:"updated_at,omitempty" bson:"updated_at,omitempty"`
 }
 
 type OrderItem struct {

@@ -62,6 +62,9 @@ func (r *OrderRepository) Create(input *model.Order) (*model.Order, error) {
 			Amount: serviceFeeAmount,
 		},
 	}
+	for _, fee := range input.Fees {
+		input.Subtotal += fee.Amount
+	}
 	input.CreatedAt = &timeNow
 	input.UpdatedAt = &timeNow
 

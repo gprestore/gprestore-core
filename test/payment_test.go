@@ -1,14 +1,13 @@
 package test
 
 import (
-	"encoding/json"
+	"fmt"
 	"log"
 	"testing"
 
 	"github.com/gprestore/gprestore-core/internal/config"
 	"github.com/gprestore/gprestore-core/internal/model"
 	"github.com/gprestore/gprestore-core/internal/service"
-	"github.com/xendit/xendit-go/v6/payment_method"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -57,10 +56,11 @@ func TestCreatePayment(t *testing.T) {
 			Email: "agil_g@safatanc.com",
 		},
 	}
-	resp, err := paymentService.CreatePayment(order, payment_method.PAYMENTMETHODTYPE_QR_CODE)
+	resp, err := paymentService.CreatePayment(order)
 	if err != nil {
 		log.Fatal(err)
 	}
-	respJson, _ := json.Marshal(resp)
-	log.Println(string(respJson))
+	order.PaymentChannel = resp
+
+	fmt.Println(*order.PaymentChannel.QrCode.Get().ChannelProperties.QrString)
 }

@@ -40,9 +40,9 @@ func InjectRoute() *route.Route {
 	stockService := service.NewStockService(stockRepository, itemRepository, validate)
 	stockHandler := rest.NewStockHandler(stockService, storeService)
 	orderRepository := repository.NewOrderRepository(mongoDatabase)
-	orderService := service.NewOrderService(orderRepository, itemRepository, stockRepository, validate)
-	orderHandler := rest.NewOrderHandler(orderService, storeService)
 	paymentService := service.NewPaymentService()
+	orderService := service.NewOrderService(orderRepository, itemRepository, stockRepository, paymentService, validate)
+	orderHandler := rest.NewOrderHandler(orderService, storeService)
 	paymentHandler := rest.NewPaymentHandler(paymentService)
 	routeRoute := route.New(serveMux, middlewareMiddleware, userHandler, authHandler, storeHandler, itemHandler, stockHandler, orderHandler, paymentHandler)
 	return routeRoute

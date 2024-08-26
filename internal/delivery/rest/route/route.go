@@ -90,10 +90,10 @@ func (r *Route) StockRoutes() {
 }
 
 func (r *Route) OrderRoutes() {
-	r.Mux.Handle("POST /order", r.Middleware.User(http.HandlerFunc(r.OrderHandler.Create)))
-	r.Mux.Handle("PATCH /order/{id}", r.Middleware.User(http.HandlerFunc(r.OrderHandler.UpdateById)))
-	r.Mux.Handle("DELETE /order/{id}", r.Middleware.User(http.HandlerFunc(r.OrderHandler.DeleteById)))
-	r.Mux.Handle("GET /orders", r.Middleware.Guest(http.HandlerFunc(r.OrderHandler.FindMany)))
+	r.Mux.Handle("POST /order", r.Middleware.Guest(http.HandlerFunc(r.OrderHandler.Create)))
+	r.Mux.Handle("PATCH /order/{id}", r.Middleware.Admin(http.HandlerFunc(r.OrderHandler.UpdateById)))
+	r.Mux.Handle("DELETE /order/{id}", r.Middleware.Admin(http.HandlerFunc(r.OrderHandler.DeleteById)))
+	r.Mux.Handle("GET /orders", r.Middleware.User(http.HandlerFunc(r.OrderHandler.FindMany)))
 	r.Mux.Handle("GET /order", r.Middleware.Guest(http.HandlerFunc(r.OrderHandler.FindOne)))
 }
 

@@ -31,26 +31,23 @@ func (h *OrderHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	authClaims, ok := r.Context().Value(variable.ContextKeyUser).(*model.AuthAccessTokenClaims)
-	if !ok {
-		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
-		return
-	}
+	if ok {
+		storeFilter := &model.StoreFilter{
+			AuthorID: authClaims.UserId,
+		}
 
-	storeFilter := &model.StoreFilter{
-		AuthorID: authClaims.UserId,
-	}
+		store, err := h.storeService.FindOne(storeFilter)
+		if err != nil {
+			handler.HandleError(w, err)
+			return
+		}
 
-	store, err := h.storeService.FindOne(storeFilter)
-	if err != nil {
-		handler.HandleError(w, err)
-		return
-	}
-
-	// Secure Create Order
-	// Author can't create order from his own store
-	if input.StoreId == store.Id.Hex() {
-		handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
-		return
+		// Secure Create Order
+		// Author can't create order from his own store
+		if input.StoreId == store.Id.Hex() {
+			handler.SendError(w, variable.ErrUnauthorized, http.StatusUnauthorized)
+			return
+		}
 	}
 
 	order, err := h.service.Create(input)

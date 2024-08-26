@@ -14,6 +14,6 @@ Internal backend for [GPrestore](https://gprestore.net)
 | Category | :x:                |                                     |
 | Stock    | :white_check_mark: |                                     |
 | Order    | :white_check_mark: | Service Fee not implemented yet     |
-| Payment  | :white_check_mark: | Payment Fee not implemented yet     |
+| Payment  | :white_check_mark: |                                     |
 | RabbitMQ | :white_check_mark: |                                     |
 | Mail     | :white_check_mark: |                                     |
