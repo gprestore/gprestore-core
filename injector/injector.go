@@ -12,6 +12,7 @@ import (
 	"github.com/gprestore/gprestore-core/internal/delivery/rest/middleware"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest/route"
 	"github.com/gprestore/gprestore-core/internal/infrastructure/database"
+	"github.com/gprestore/gprestore-core/internal/pkg/flip"
 	"github.com/gprestore/gprestore-core/internal/repository"
 	"github.com/gprestore/gprestore-core/internal/service"
 	"github.com/gprestore/gprestore-core/internal/validation"
@@ -46,6 +47,9 @@ func InjectRoute() *route.Route {
 		repository.NewOrderRepository,
 		service.NewOrderService,
 		rest.NewOrderHandler,
+
+		flip.NewFlipClient,
+		service.NewPaymentService,
 
 		route.New,
 	)

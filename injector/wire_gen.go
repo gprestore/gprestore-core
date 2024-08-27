@@ -12,6 +12,7 @@ import (
 	"github.com/gprestore/gprestore-core/internal/delivery/rest/middleware"
 	"github.com/gprestore/gprestore-core/internal/delivery/rest/route"
 	"github.com/gprestore/gprestore-core/internal/infrastructure/database"
+	"github.com/gprestore/gprestore-core/internal/pkg/flip"
 	"github.com/gprestore/gprestore-core/internal/repository"
 	"github.com/gprestore/gprestore-core/internal/service"
 	"github.com/gprestore/gprestore-core/internal/validation"
@@ -40,7 +41,9 @@ func InjectRoute() *route.Route {
 	stockService := service.NewStockService(stockRepository, itemRepository, validate)
 	stockHandler := rest.NewStockHandler(stockService, storeService)
 	orderRepository := repository.NewOrderRepository(mongoDatabase)
-	orderService := service.NewOrderService(orderRepository, itemRepository, stockRepository, validate)
+	flipClient := flip.NewFlipClient()
+	paymentService := service.NewPaymentService(flipClient, validate)
+	orderService := service.NewOrderService(orderRepository, itemRepository, stockRepository, paymentService, validate)
 	orderHandler := rest.NewOrderHandler(orderService, storeService)
 	routeRoute := route.New(serveMux, middlewareMiddleware, userHandler, authHandler, storeHandler, itemHandler, stockHandler, orderHandler)
 	return routeRoute

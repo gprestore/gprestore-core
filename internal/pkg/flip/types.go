@@ -5,6 +5,30 @@ import "time"
 const (
 	FlipBillTypeSingle   = "SINGLE"
 	FlipBillTypeMultiple = "MULTIPLE"
+
+	FlipCodeBNI          = "bni"
+	FlipCodeBRI          = "bri"
+	FlipCodeBCA          = "bca"
+	FlipCodeMandiri      = "mandiri"
+	FlipCodeCIMB         = "cimb"
+	FlipCodeBTPN         = "tabungan_pensiunan_nasional"
+	FlipCodeDBS          = "dbs"
+	FlipCodePermata      = "permata"
+	FlipCodeMuamalat     = "muamalat"
+	FlipCodeDanamon      = "danamon"
+	FlipCodeBSI          = "bsm"
+	FlipCodeOvo          = "ovo"
+	FlipCodeQris         = "qris"
+	FlipCodeShopeepayApp = "shopeepay_app"
+	FlipCodeLinkAja      = "linkaja"
+	FlipCodeLinkAjaApp   = "linkaja_app"
+	FlipCodeDana         = "dana"
+
+	FlipAccountTypeBankAccount            = "bank_account"
+	FlipAccountTypeVirtualAccount         = "virtual_account"
+	FlipAccountTypeWalletAccount          = "wallet_account"
+	FlipAccountTypeOnlineToOfflineAccount = "online_to_offline_account"
+	FlipAccountTypeCreditCardAccount      = "credit_card_account"
 )
 
 type FlipBillRequest struct {

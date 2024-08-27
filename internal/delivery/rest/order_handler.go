@@ -125,7 +125,7 @@ func (h *OrderHandler) FindMany(w http.ResponseWriter, r *http.Request) {
 		Id:      r.URL.Query().Get("id"),
 		Code:    r.URL.Query().Get("code"),
 		StoreId: r.URL.Query().Get("store_id"),
-		Customer: model.OrderCustomer{
+		Customer: &model.OrderCustomer{
 			Email: r.URL.Query().Get("customer.email"),
 		},
 	}
@@ -175,7 +175,7 @@ func (h *OrderHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 		Id:      r.URL.Query().Get("id"),
 		Code:    r.URL.Query().Get("code"),
 		StoreId: r.URL.Query().Get("store_id"),
-		Customer: model.OrderCustomer{
+		Customer: &model.OrderCustomer{
 			Email: r.URL.Query().Get("customer.email"),
 		},
 	}

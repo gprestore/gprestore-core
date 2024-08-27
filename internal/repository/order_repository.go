@@ -8,6 +8,7 @@ import (
 
 	"github.com/gprestore/gprestore-core/internal/model"
 	"github.com/gprestore/gprestore-core/pkg/converter"
+	"github.com/gprestore/gprestore-core/pkg/random"
 	"github.com/gprestore/gprestore-core/pkg/variable"
 	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/bson"
@@ -55,6 +56,7 @@ func (r *OrderRepository) Create(input *model.Order) (*model.Order, error) {
 
 	timeNow := time.Now()
 	input.Id = primitive.NewObjectID()
+	input.Code = "GPR-" + random.String(10)
 	input.Status = variable.ORDER_AWAITING_PAYMENT
 	input.Fees = []model.OrderFee{
 		{
@@ -64,6 +66,9 @@ func (r *OrderRepository) Create(input *model.Order) (*model.Order, error) {
 	}
 	for _, fee := range input.Fees {
 		input.Subtotal += fee.Amount
+	}
+	for _, item := range input.Items {
+		input.Subtotal += item.Price * item.Quantity
 	}
 	input.CreatedAt = &timeNow
 	input.UpdatedAt = &timeNow
