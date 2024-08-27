@@ -1,66 +1,65 @@
 package test
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"testing"
 
 	"github.com/gprestore/gprestore-core/internal/config"
-	"github.com/gprestore/gprestore-core/internal/model"
-	"github.com/gprestore/gprestore-core/internal/service"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"github.com/gprestore/gprestore-core/internal/pkg/flip"
 )
 
-var paymentService *service.PaymentService
+var flipClient *flip.FlipClient
 
 func init() {
 	config.Load()
-	paymentService = service.NewPaymentService()
+	flipClient = flip.NewFlipClient()
 }
 
-func TestPayment(t *testing.T) {
-	order := &model.Order{
-		Code:     "GPR-0123",
-		Subtotal: 10000,
+func TestCreateBill(t *testing.T) {
+	request := &flip.FlipBillRequest{
+		Title:          "Minecraft Full Access",
+		Amount:         150000,
+		Type:           flip.FlipBillTypeSingle,
+		Step:           "3",
+		SenderName:     "Agil Ghani Istikmal",
+		SenderEmail:    "agilistikmal3@gmail.com",
+		SenderBank:     "qris",
+		SenderBankType: "wallet_account",
 	}
-	inv, err := paymentService.CreateInvoice(order)
-	log.Println("Error:")
-	log.Println(err)
-	log.Println(inv.InvoiceUrl)
-}
 
-func TestGetPaymentMethods(t *testing.T) {
-	methods, err := paymentService.GetPaymentMethods()
+	bill, err := flipClient.CreatePayment(request)
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Println(methods)
+	billJson, _ := json.Marshal(bill)
+	fmt.Println(string(billJson))
 }
 
-func TestCreatePayment(t *testing.T) {
-	order := &model.Order{
-		Id:      primitive.NewObjectID(),
-		StoreId: primitive.NewObjectID().Hex(),
-		Items: []model.OrderItem{
-			{
-				ItemId:   primitive.NilObjectID.Hex(),
-				Name:     "Minecraft Alts",
-				Price:    10000,
-				Quantity: 1,
-			},
-		},
-		Code:     "GPR-0123",
-		Subtotal: 10000,
-		Customer: model.OrderCustomer{
-			Name:  "Agil Ghani Istikmal",
-			Email: "agil_g@safatanc.com",
-		},
-	}
-	resp, err := paymentService.CreatePayment(order)
+func TestGetBills(t *testing.T) {
+	bills, err := flipClient.GetBills()
 	if err != nil {
 		log.Fatal(err)
 	}
-	order.PaymentChannel = resp
+	billsJson, _ := json.Marshal(bills)
+	fmt.Println(string(billsJson))
+}
 
-	fmt.Println(*order.PaymentChannel.QrCode.Get().ChannelProperties.QrString)
+func TestGetBill(t *testing.T) {
+	bill, err := flipClient.GetBill(128572)
+	if err != nil {
+		log.Fatal(err)
+	}
+	billJson, _ := json.Marshal(bill)
+	fmt.Println(string(billJson))
+}
+
+func TestGetPayment(t *testing.T) {
+	bill, err := flipClient.GetPayment(128572)
+	if err != nil {
+		log.Fatal(err)
+	}
+	billJson, _ := json.Marshal(bill)
+	fmt.Println(string(billJson))
 }

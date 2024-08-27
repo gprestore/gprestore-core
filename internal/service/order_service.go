@@ -15,16 +15,14 @@ type OrderService struct {
 	repository      *repository.OrderRepository
 	itemRepository  *repository.ItemRepository
 	stockRepository *repository.StockRepository
-	paymentService  *PaymentService
 	validate        *validator.Validate
 }
 
-func NewOrderService(repository *repository.OrderRepository, itemRepository *repository.ItemRepository, stockRepository *repository.StockRepository, paymentService *PaymentService, validate *validator.Validate) *OrderService {
+func NewOrderService(repository *repository.OrderRepository, itemRepository *repository.ItemRepository, stockRepository *repository.StockRepository, validate *validator.Validate) *OrderService {
 	return &OrderService{
 		repository:      repository,
 		itemRepository:  itemRepository,
 		stockRepository: stockRepository,
-		paymentService:  paymentService,
 		validate:        validate,
 	}
 }
@@ -66,24 +64,6 @@ func (s *OrderService) Create(input *model.OrderCreate) (*model.Order, error) {
 	}
 
 	order, err := s.repository.Create(inputOrder)
-	if err != nil {
-		return nil, err
-	}
-
-	paymentChannel, err := s.paymentService.CreatePayment(order)
-	if err != nil {
-		return nil, err
-	}
-
-	orderFilter := &model.OrderFilter{
-		Id: order.Id.Hex(),
-	}
-
-	orderUpdate := &model.Order{
-		PaymentChannel: paymentChannel,
-	}
-
-	order, err = s.repository.Update(orderFilter, orderUpdate)
 	if err != nil {
 		return nil, err
 	}
