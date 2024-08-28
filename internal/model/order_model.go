@@ -6,7 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-// AWAITING_PAYMENT, PAYMENT_SUCCESS, COMPLETED, EXPIRED
+// NOT_CONFIRMED, PENDING, PROCESSED, CANCELLED, FAILED, DONE
 type OrderStatus string
 
 // flip.FlipCode...
@@ -24,7 +24,7 @@ type Order struct {
 	PaymentBankCode PaymentBankCode    `json:"payment_bank_code,omitempty" bson:"payment_bank_code,omitempty"`
 	Payment         *Payment           `json:"payment,omitempty" bson:"payment,omitempty"`
 	Fees            []OrderFee         `json:"fees,omitempty" bson:"fees,omitempty"`
-	Customer        OrderCustomer      `json:"customer,omitempty" bson:"customer,omitempty"`
+	Customer        *OrderCustomer     `json:"customer,omitempty" bson:"customer,omitempty"`
 	Subtotal        int                `json:"subtotal,omitempty" bson:"subtotal,omitempty"`
 	Status          OrderStatus        `json:"status,omitempty" bson:"status,omitempty"`
 	CreatedAt       *time.Time         `json:"created_at,omitempty" bson:"created_at,omitempty"`
@@ -39,17 +39,8 @@ type OrderItem struct {
 }
 
 type OrderCustomer struct {
-	Name  string `validate:"required,min=3" json:"name,omitempty" bson:"name,omitempty"`
-	Email string `validate:"required,email" json:"email,omitempty" bson:"email,omitempty"`
-}
-
-type OrderPayment struct {
-	Id            string
-	Reference     string
-	Channel       string
-	AccountNumber string
-	QrisString    string
-	Status        string
+	Name  string `json:"name,omitempty" bson:"name,omitempty"`
+	Email string `json:"email,omitempty" bson:"email,omitempty"`
 }
 
 type OrderFee struct {
@@ -58,20 +49,30 @@ type OrderFee struct {
 }
 
 type OrderCreate struct {
-	StoreId         string          `validate:"required,mongodb" json:"store_id,omitempty" bson:"store_id,omitempty"`
-	Items           []OrderItem     `validate:"required,min=1" json:"items,omitempty" bson:"items,omitempty"`
-	Customer        OrderCustomer   `validate:"required" json:"customer,omitempty" bson:"customer,omitempty"`
-	PaymentBankType PaymentBankType `validate:"required" json:"payment_bank_type,omitempty" bson:"payment_bank_type,omitempty"`
-	PaymentBankCode PaymentBankCode `validate:"required" json:"payment_bank_code,omitempty" bson:"payment_bank_code,omitempty"`
+	StoreId         string               `validate:"required,mongodb" json:"store_id,omitempty" bson:"store_id,omitempty"`
+	Items           []OrderItem          `validate:"required,min=1" json:"items,omitempty" bson:"items,omitempty"`
+	Customer        *OrderCustomerCreate `validate:"required" json:"customer,omitempty" bson:"customer,omitempty"`
+	PaymentBankType PaymentBankType      `validate:"required" json:"payment_bank_type,omitempty" bson:"payment_bank_type,omitempty"`
+	PaymentBankCode PaymentBankCode      `validate:"required" json:"payment_bank_code,omitempty" bson:"payment_bank_code,omitempty"`
 }
 
 type OrderUpdate struct {
 	Status OrderStatus `json:"status,omitempty" bson:"status,omitempty"`
 }
 
+type OrderCustomerCreate struct {
+	Name  string `validate:"required,min=3" json:"name,omitempty" bson:"name,omitempty"`
+	Email string `validate:"required,email" json:"email,omitempty" bson:"email,omitempty"`
+}
+
+type OrderCustomerFilter struct {
+	Name  string `validate:"omitempty,min=3" json:"name,omitempty" bson:"name,omitempty"`
+	Email string `validate:"omitempty,email" json:"email,omitempty" bson:"email,omitempty"`
+}
+
 type OrderFilter struct {
-	Id       string         `validate:"omitempty,mongodb" json:"id,omitempty" bson:"_id,omitempty"`
-	Code     string         `validate:"omitempty" json:"code,omitempty" bson:"code,omitempty"`
-	StoreId  string         `validate:"omitempty,mongodb" json:"store_id,omitempty" bson:"store_id,omitempty"`
-	Customer *OrderCustomer `validate:"omitempty" json:"customer,omitempty" bson:"customer,omitempty"`
+	Id       string               `validate:"omitempty,mongodb" json:"id,omitempty" bson:"_id,omitempty"`
+	Code     string               `validate:"omitempty" json:"code,omitempty" bson:"code,omitempty"`
+	StoreId  string               `validate:"omitempty,mongodb" json:"store_id,omitempty" bson:"store_id,omitempty"`
+	Customer *OrderCustomerFilter `validate:"omitempty" json:"customer,omitempty" bson:"customer,omitempty"`
 }

@@ -141,6 +141,21 @@ func (s *OrderService) FindOne(filter *model.OrderFilter) (*model.Order, error) 
 		return nil, err
 	}
 
+	flipPaymentData, err := s.paymentService.GetPaymentData(order.Payment.LinkId)
+	if err != nil {
+		return nil, err
+	}
+
+	if flipPaymentData.Status != string(order.Status) {
+		orderUpdate := &model.OrderUpdate{
+			Status: model.OrderStatus(flipPaymentData.Status),
+		}
+		order, err = s.Update(filter, orderUpdate)
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	return order, nil
 }
 

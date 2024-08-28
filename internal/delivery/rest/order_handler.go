@@ -125,9 +125,12 @@ func (h *OrderHandler) FindMany(w http.ResponseWriter, r *http.Request) {
 		Id:      r.URL.Query().Get("id"),
 		Code:    r.URL.Query().Get("code"),
 		StoreId: r.URL.Query().Get("store_id"),
-		Customer: &model.OrderCustomer{
+	}
+
+	if r.URL.Query().Get("customer.email") != "" {
+		filter.Customer = &model.OrderCustomerFilter{
 			Email: r.URL.Query().Get("customer.email"),
-		},
+		}
 	}
 
 	// Secure Find Orders
@@ -175,9 +178,12 @@ func (h *OrderHandler) FindOne(w http.ResponseWriter, r *http.Request) {
 		Id:      r.URL.Query().Get("id"),
 		Code:    r.URL.Query().Get("code"),
 		StoreId: r.URL.Query().Get("store_id"),
-		Customer: &model.OrderCustomer{
+	}
+
+	if r.URL.Query().Get("customer.email") != "" {
+		filter.Customer = &model.OrderCustomerFilter{
 			Email: r.URL.Query().Get("customer.email"),
-		},
+		}
 	}
 
 	order, err := h.service.FindOne(filter)

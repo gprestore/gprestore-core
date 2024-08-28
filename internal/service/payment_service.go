@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gprestore/gprestore-core/internal/model"
@@ -51,4 +52,37 @@ func (s *PaymentService) Create(order *model.Order) (*model.Payment, error) {
 	}
 
 	return payment, nil
+}
+
+func (s *PaymentService) GetBill(linkId string) (*flip.FlipBill, error) {
+	id, _ := strconv.Atoi(linkId)
+	bill, err := s.flipClient.GetBill(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return bill, err
+}
+
+func (s *PaymentService) GetPayment(linkId string) (*flip.FlipPayment, error) {
+	id, _ := strconv.Atoi(linkId)
+	payment, err := s.flipClient.GetPayment(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return payment, nil
+}
+
+func (s *PaymentService) GetPaymentData(linkId string) (*flip.FlipPaymentData, error) {
+	payment, err := s.GetPayment(linkId)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(payment.Data) == 0 {
+		return nil, fmt.Errorf("no document in result")
+	}
+
+	return &payment.Data[0], nil
 }

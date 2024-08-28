@@ -57,7 +57,7 @@ func (r *OrderRepository) Create(input *model.Order) (*model.Order, error) {
 	timeNow := time.Now()
 	input.Id = primitive.NewObjectID()
 	input.Code = "GPR-" + random.String(10)
-	input.Status = variable.ORDER_AWAITING_PAYMENT
+	input.Status = variable.ORDER_PENDING
 	input.Fees = []model.OrderFee{
 		{
 			Name:   "Service Fee",
